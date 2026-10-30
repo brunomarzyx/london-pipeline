@@ -44,7 +44,7 @@ export async function briefForBorough(code: string): Promise<Brief> {
     priceChange: r1(d.priceChange),
     netBuildup: d.netBuildup,
     pressure: r1(d.pressure),
-    momentum: r1(d.momentum),
+    momentum: d.momentum == null ? null : Math.round(d.momentum * 1000) / 1000,
   };
   const system = await fs.readFile(
     path.join(process.cwd(), "prompts", "brief.md"),

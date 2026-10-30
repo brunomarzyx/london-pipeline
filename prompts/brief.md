@@ -18,3 +18,5 @@ Exact JSON schema (reply with a single JSON object, no other text):
 {"headline": "string (one line)", "supply_view": "string", "price_view": "string", "risk_flag": "low|medium|high", "confidence": "high|medium|low"}
 
 Fallback: confidence is "high" when latestPrice, priceChange and netBuildup are all present, "medium" if one of them is null, "low" if two or more are null. A null momentum alone does not lower confidence.
+
+- momentum is a fraction in the input: always write it as a percentage with one decimal (−0.172 → −17.2%).

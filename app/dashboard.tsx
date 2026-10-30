@@ -2,9 +2,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { BoroughMetrics } from "@/lib/db";
+import {
+  PHASE_COLOR,
+  PHASE_LABEL,
+  classifyCycle,
+  type CyclePhase,
+} from "@/lib/cycle-phase";
 import AskBox from "./ask-box";
 
 export type MetricKey = "priceChange" | "netBuildup" | "pressure" | "momentum";
+export type LayerKey = MetricKey | "phase";
+
+const PHASE_ORDER: CyclePhase[] = ["hypersupply", "expansion", "recession", "recovery", "unknown"];
+
+function phaseOf(m: BoroughMetrics): CyclePhase {
+  return classifyCycle(m.priceChange, m.pressure, m.momentum);
+}
 
 const METRICS: { key: MetricKey; label: string; fmt: (v: number | null) => string }[] = [
   { key: "priceChange", label: "Price Δ 12m %", fmt: (v) => (v == null ? "no data" : `${v.toFixed(1)}%`) },
@@ -31,7 +44,8 @@ function colorFor(v: number | null, breaks: number[]): string {
 }
 
 export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
-  const [metric, setMetric] = useState<MetricKey>("priceChange");
+  const [metric, setMetric] = useState<LayerKey>("priceChange");
+  const isPhase = metric === "phase";
   const [selected, setSelected] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<any>(null);
@@ -41,23 +55,37 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
 
   const byCode = useMemo(() => Object.fromEntries(metrics.map((m) => [m.code, m])), [metrics]);
   const vals = useMemo(
-    () => metrics.map((m) => m[metric]).filter((v): v is number => v != null && Number.isFinite(v)),
-    [metrics, metric],
+    () =>
+      isPhase
+        ? []
+        : metrics
+            .map((m) => m[metric as MetricKey])
+            .filter((v): v is number => v != null && Number.isFinite(v)),
+    [metrics, metric, isPhase],
   );
   const breaks = useMemo(() => breaksFor(vals), [vals]);
   const breaksRef = useRef(breaks);
   breaksRef.current = breaks;
   const ranked = useMemo(() => {
     const arr = [...metrics];
+    if (isPhase) {
+      arr.sort(
+        (a, b) =>
+          PHASE_ORDER.indexOf(phaseOf(a)) - PHASE_ORDER.indexOf(phaseOf(b)) ||
+          a.name.localeCompare(b.name),
+      );
+      return arr;
+    }
+    const key = metric as MetricKey;
     arr.sort((a, b) => {
-      const av = a[metric] as number | null, bv = b[metric] as number | null;
+      const av = a[key] as number | null, bv = b[key] as number | null;
       if (av == null && bv == null) return a.name.localeCompare(b.name);
       if (av == null) return 1;
       if (bv == null) return -1;
       return (bv as number) - (av as number);
     });
     return arr;
-  }, [metrics, metric]);
+  }, [metrics, metric, isPhase]);
 
   useEffect(() => {
     let dead = false;
@@ -75,10 +103,13 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
         const s = stateRef.current;
         const code = f?.properties?.code as string;
         const m = s.metrics.find((x) => x.code === code);
-        const v = (m?.[s.metric] ?? null) as number | null;
         const isSel = code === s.selected;
+        const fillColor =
+          s.metric === "phase"
+            ? PHASE_COLOR[m ? phaseOf(m) : "unknown"]
+            : colorFor((m?.[s.metric as MetricKey] ?? null) as number | null, breaksRef.current);
         return {
-          fillColor: colorFor(v, breaksRef.current),
+          fillColor,
           weight: isSel ? 3 : 1,
           color: isSel ? "#0f172a" : "#ffffff",
           fillOpacity: 0.8,
@@ -100,13 +131,17 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
   useEffect(() => {
     const layer = layerRef.current;
     if (!layer) return;
-    const fmt = METRICS.find((m) => m.key === metric)!.fmt;
+    const fmt = METRICS.find((m) => m.key === metric)?.fmt;
     layer.setStyle((f: any) => {
       const code = f?.properties?.code as string;
-      const v = (byCode[code]?.[metric] ?? null) as number | null;
+      const m = byCode[code];
       const isSel = code === selected;
+      const fillColor =
+        isPhase || !m
+          ? PHASE_COLOR[m ? phaseOf(m) : "unknown"]
+          : colorFor((m[metric as MetricKey] ?? null) as number | null, breaks);
       return {
-        fillColor: colorFor(v, breaks),
+        fillColor,
         weight: isSel ? 3 : 1,
         color: isSel ? "#0f172a" : "#ffffff",
         fillOpacity: 0.8,
@@ -114,11 +149,17 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
     });
     layer.eachLayer((l: any) => {
       const m = byCode[l.feature?.properties?.code];
-      if (m) l.setTooltipContent(`${l.feature.properties.name}: ${fmt((m[metric] ?? null) as number | null)}`);
+      if (m)
+        l.setTooltipContent(
+          isPhase || !fmt
+            ? `${l.feature.properties.name}: ${PHASE_LABEL[phaseOf(m)]}`
+            : `${l.feature.properties.name}: ${fmt((m[metric as MetricKey] ?? null) as number | null)}`,
+        );
     });
-  }, [metric, breaks, byCode, selected]);
+  }, [metric, breaks, byCode, selected, isPhase]);
 
-  const fmt = METRICS.find((m) => m.key === metric)!.fmt;
+  const fmt = METRICS.find((m) => m.key === metric)?.fmt
+    ?? ((v: number | null) => (v == null ? "no data" : String(v)));
 
   return (
     <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
@@ -137,6 +178,12 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
               {m.label}
             </button>
           ))}
+          <button
+            onClick={() => setMetric("phase")}
+            className={`rounded-full px-3 py-1 text-sm ${metric === "phase" ? "bg-sky-400 font-medium text-slate-950" : "text-slate-300 hover:text-white"}`}
+          >
+            Cycle phase
+          </button>
           </div>
         </div>
       </header>
@@ -144,8 +191,14 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
         <div className="relative min-w-0 flex-1">
           <div ref={mapRef} className="absolute inset-0 z-0" />
           <div className="absolute bottom-6 left-3 z-10 rounded-lg bg-white/95 p-3 text-xs text-slate-800 shadow">
-            <div className="mb-1 font-semibold">{METRICS.find((m) => m.key === metric)!.label}</div>
-            {breaks.length === 0 ? <div>no data</div> : (
+            <div className="mb-1 font-semibold">{isPhase ? "Cycle phase" : METRICS.find((m) => m.key === metric)!.label}</div>
+            {isPhase ? (
+              <>
+                {PHASE_ORDER.map((p) => (
+                  <div key={p} className="flex items-center gap-1"><span className="inline-block h-3 w-8" style={{ background: PHASE_COLOR[p] }} />{PHASE_LABEL[p]}</div>
+                ))}
+              </>
+            ) : breaks.length === 0 ? <div>no data</div> : (
               <>
                 <div className="flex items-center gap-1"><span className="inline-block h-3 w-8" style={{ background: COLORS[0] }} />≤ {fmt(breaks[0])}</div>
                 {breaks.slice(1).map((b, i) => (
@@ -154,11 +207,13 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
                 <div className="flex items-center gap-1"><span className="inline-block h-3 w-8" style={{ background: COLORS[4] }} />&gt; {fmt(breaks[breaks.length - 1])}</div>
               </>
             )}
-            <div className="mt-1 flex items-center gap-1"><span className="inline-block h-3 w-8" style={{ background: NODATA }} />no data</div>
+            {!isPhase && (
+              <div className="mt-1 flex items-center gap-1"><span className="inline-block h-3 w-8" style={{ background: NODATA }} />no data</div>
+            )}
           </div>
         </div>
         <aside className="hidden w-[380px] shrink-0 flex-col border-l border-slate-800 bg-white text-slate-900 md:flex">
-          <div className="border-b px-4 py-2 text-sm font-semibold">Ranked — {METRICS.find((m) => m.key === metric)!.label}</div>
+          <div className="border-b px-4 py-2 text-sm font-semibold">Ranked — {isPhase ? "Cycle phase" : METRICS.find((m) => m.key === metric)!.label}</div>
           <div className="min-h-0 flex-1 overflow-auto">
             <table className="w-full text-sm">
               <tbody>
@@ -170,7 +225,18 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
                       <Link href={`/borough/${r.code}`} className="underline-offset-2 hover:underline">{r.name}</Link>
                     </td>
                     <td className="px-3 py-1.5 text-right tabular-nums">
-                      {(r[metric] as number | null) == null ? <span className="text-slate-400">no data</span> : fmt(r[metric] as number)}
+                      {isPhase ? (
+                        <span
+                          className="inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white"
+                          style={{ background: PHASE_COLOR[phaseOf(r)] }}
+                        >
+                          {PHASE_LABEL[phaseOf(r)]}
+                        </span>
+                      ) : (r[metric as MetricKey] as number | null) == null ? (
+                        <span className="text-slate-400">no data</span>
+                      ) : (
+                        fmt(r[metric as MetricKey] as number)
+                      )}
                     </td>
                   </tr>
                 ))}
