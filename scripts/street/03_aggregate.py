@@ -176,7 +176,7 @@ def main():
     db.executemany("INSERT INTO meta VALUES (?, ?)", [(k, str(v)) for k, v in meta.items()])
     for sql in ["CREATE INDEX ix_area ON area_stats(level, code)", "CREATE INDEX ix_pc ON postcodes(postcode)",
                 "CREATE INDEX ix_sales_sector ON sales(sector, date)", "CREATE INDEX ix_sales_street ON sales(street_key)",
-                "CREATE INDEX ix_sales_pc ON sales(postcode)"]:
+                "CREATE INDEX ix_sales_pc ON sales(postcode)", "CREATE INDEX ix_sales_lsoa ON sales(lsoa, postcode)"]:
         db.execute(sql)
     db.commit()
     print(meta)
