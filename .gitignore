@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.env
+.env.local
+logs/
+data/raw/*.zip
+data/raw/boundaries/
+*.db
+.DS_Store
