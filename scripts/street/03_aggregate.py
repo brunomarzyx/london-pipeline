@@ -25,6 +25,9 @@ DB = os.path.join(ROOT, "data", "street.db")
 
 
 def clean_sales(con):
+    # EPC match is optional: without it the £/sq m columns are simply null.
+    epc = os.path.join(S, "epc_match.parquet")
+    EPC_SRC = f"'{epc}'" if os.path.exists(epc) else "(SELECT NULL::VARCHAR txn_id, NULL::DOUBLE floor_area, NULL::INT rooms, NULL::VARCHAR rating WHERE false)"
     con.execute(f"""
     CREATE TABLE clean AS
     WITH j AS (
@@ -39,8 +42,9 @@ def clean_sales(con):
       SELECT msoa, type, quantile_cont(ln(price), 0.25) q1, quantile_cont(ln(price), 0.75) q3
       FROM j GROUP BY ALL
     )
-    SELECT j.*, CASE WHEN j.street IS NULL OR j.street = '' THEN NULL ELSE j.district_pc || '|' || j.street END AS street_key
-    FROM j JOIN q USING (msoa, type)
+    SELECT j.*, CASE WHEN j.street IS NULL OR j.street = '' THEN NULL ELSE j.district_pc || '|' || j.street END AS street_key,
+           e.floor_area, e.rooms, e.rating AS epc_rating, round(j.price / e.floor_area) AS ppsm
+    FROM j JOIN q USING (msoa, type) LEFT JOIN {EPC_SRC} e USING (txn_id)
     WHERE ln(j.price) BETWEEN q.q1 - {OUTLIER_IQR}*(q.q3-q.q1) AND q.q3 + {OUTLIER_IQR}*(q.q3-q.q1)
     """)
 
@@ -68,6 +72,16 @@ def level_stats(con, asof):
           median(price) FILTER (WHERE date > d36 AND type <> 'F') AS med_house,
           quantile_cont(price, 0.25) FILTER (WHERE date > d36 AND type <> 'F') AS p25_house,
           quantile_cont(price, 0.75) FILTER (WHERE date > d36 AND type <> 'F') AS p75_house,
+          count(ppsm) FILTER (WHERE date > d36) AS n_ppsm,
+          median(ppsm) FILTER (WHERE date > d36) AS med_ppsm,
+          count(ppsm) FILTER (WHERE date > d36 AND type = 'F') AS n_ppsm_flat,
+          median(ppsm) FILTER (WHERE date > d36 AND type = 'F') AS med_ppsm_flat,
+          quantile_cont(ppsm, 0.25) FILTER (WHERE date > d36 AND type = 'F') AS p25_ppsm_flat,
+          quantile_cont(ppsm, 0.75) FILTER (WHERE date > d36 AND type = 'F') AS p75_ppsm_flat,
+          count(ppsm) FILTER (WHERE date > d36 AND type <> 'F') AS n_ppsm_house,
+          median(ppsm) FILTER (WHERE date > d36 AND type <> 'F') AS med_ppsm_house,
+          quantile_cont(ppsm, 0.25) FILTER (WHERE date > d36 AND type <> 'F') AS p25_ppsm_house,
+          quantile_cont(ppsm, 0.75) FILTER (WHERE date > d36 AND type <> 'F') AS p75_ppsm_house,
           count(*) FILTER (WHERE date > d12) AS n_12m,
           count(*) FILTER (WHERE date > d24 AND date <= d12) AS n_prev12,
           avg(lat) FILTER (WHERE date > d36) AS lat, avg(lon) FILTER (WHERE date > d36) AS lon
@@ -146,7 +160,7 @@ def main():
     sales = con.execute(f"""
       SELECT txn_id, date::VARCHAR AS date, price, postcode, type, new_build::INT AS new_build, tenure,
              trim(saon || ' ' || paon || ' ' || coalesce(initcap(street), '')) AS address,
-             street_key, sector, lsoa, msoa, lad, lat, lon
+             street_key, sector, lsoa, msoa, lad, lat, lon, floor_area, ppsm, epc_rating
       FROM clean WHERE date > DATE '{asof}' - INTERVAL {LEVEL_MONTHS} MONTH""").df()
 
     if os.path.exists(DB):
@@ -157,7 +171,7 @@ def main():
     sales.to_sql("sales", db, index=False)
     meta = {"asof": asof, "level_months": LEVEL_MONTHS, "min_n": MIN_N, "min_pairs": MIN_PAIRS,
             "clean_sales": con.execute("SELECT count(*) FROM clean").fetchone()[0], "repeat_pairs": npairs,
-            "source": "HM Land Registry Price Paid (OGL v3); ONS postcode lookup May 2026; OS Code-Point Open"}
+            "source": "HM Land Registry Price Paid (OGL v3); MHCLG domestic EPC register (floor area); ONS postcode lookup May 2026; OS Code-Point Open"}
     db.execute("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)")
     db.executemany("INSERT INTO meta VALUES (?, ?)", [(k, str(v)) for k, v in meta.items()])
     for sql in ["CREATE INDEX ix_area ON area_stats(level, code)", "CREATE INDEX ix_pc ON postcodes(postcode)",

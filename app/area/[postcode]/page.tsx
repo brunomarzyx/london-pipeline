@@ -29,7 +29,7 @@ export default function AreaPage({
   searchParams,
 }: {
   params: { postcode: string };
-  searchParams: { type?: string; price?: string };
+  searchParams: { type?: string; price?: string; sqm?: string };
 }) {
   const raw = decodeURIComponent(params.postcode);
   const pc = normalisePostcode(raw);
@@ -40,7 +40,9 @@ export default function AreaPage({
       : searchParams.type === "flat"
         ? "flat"
         : null;
-  const r = getAreaComps(pc, type ?? undefined);
+  const sqmParam = Number(searchParams.sqm);
+  const sqm = Number.isFinite(sqmParam) && sqmParam > 0 ? sqmParam : null;
+  const r = getAreaComps(pc, type ?? undefined, sqm);
   if ("error" in r) notFound();
   const typeLabel = r.type ?? "property";
   const priceParam = Number(searchParams.price);
@@ -79,9 +81,61 @@ export default function AreaPage({
           </p>
         )}
         <PriceCheck prices={r.comps.map((c) => c.price)} />
+      </div>
+
+      <div className="mt-4 rounded-xl border bg-white p-4">
+        <h2 className="text-sm font-semibold">Size-adjusted fair range</h2>
+        <form method="get" className="mt-2 flex flex-wrap items-end gap-2 text-sm">
+          <label className="flex flex-col">
+            <span className="text-xs text-slate-500">Type</span>
+            <select name="type" defaultValue={r.type ?? ""} className="rounded border px-2 py-1">
+              <option value="">Any</option>
+              <option value="flat">Flat</option>
+              <option value="house">House</option>
+            </select>
+          </label>
+          <label className="flex flex-col">
+            <span className="text-xs text-slate-500">Floor area (sq m)</span>
+            <input name="sqm" type="number" min={15} max={1000} defaultValue={sqm ?? ""} className="w-28 rounded border px-2 py-1" />
+          </label>
+          <label className="flex flex-col">
+            <span className="text-xs text-slate-500">Asking price (£)</span>
+            <input name="price" type="number" min={0} defaultValue={Number.isFinite(priceParam) && priceParam > 0 ? priceParam : ""} className="w-32 rounded border px-2 py-1" />
+          </label>
+          <button className="rounded bg-sky-700 px-3 py-1 text-white">Check</button>
+        </form>
+        {r.ppsm == null ? (
+          <p className="mt-2 text-sm text-slate-600">
+            Not enough size-matched sales near {r.postcode} for a reliable £/sq m figure.
+          </p>
+        ) : (
+          <>
+            <p className="mt-2 text-lg">
+              {gbp(r.ppsm.median)}/sq m{" "}
+              <span className="text-sm text-slate-600">
+                on {r.ppsm.name} (n = {r.ppsm.n} size-matched sales{r.ppsm.p25 != null && r.ppsm.p75 != null ? `; middle half ${gbp(r.ppsm.p25)}–${gbp(r.ppsm.p75)}/sq m` : ""})
+              </span>
+            </p>
+            {r.ppsm.fairRange ? (
+              <p className="mt-1 text-sm font-medium">
+                Fair range for {r.ppsm.fairRange.sqm} sq m: {gbp(r.ppsm.fairRange.low)}–{gbp(r.ppsm.fairRange.high)}, mid {gbp(r.ppsm.fairRange.mid)}
+                {Number.isFinite(priceParam) && priceParam > 0 && (
+                  <> · asking {gbp(priceParam)} is{" "}
+                    {priceParam > r.ppsm.fairRange.high ? "above the range" : priceParam < r.ppsm.fairRange.low ? "below the range" : "within the range"}
+                    {" "}({gbp(priceParam / r.ppsm.fairRange.sqm)}/sq m)
+                  </>
+                )}
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-slate-600">Enter a floor area for a size-adjusted fair range.</p>
+            )}
+            {r.ppsm.p25 == null && (
+              <p className="mt-1 text-xs text-slate-500">Choose flat or house for quartiles and a fair range.</p>
+            )}
+          </>
+        )}
         <p className="mt-2 text-xs text-slate-500">
-          Not size-adjusted: no floor-area data yet (EPC floor areas are the
-          next step).
+          Floor areas from the MHCLG EPC register, matched to Land Registry sales by postcode and address. Last 36 months; levels need n ≥ 10.
         </p>
       </div>
 
@@ -141,6 +195,9 @@ export default function AreaPage({
               <th className="py-1">Address</th>
               <th>Date</th>
               <th className="text-right">Price</th>
+              <th className="text-right">Size</th>
+              <th className="text-right">£/sq m</th>
+              <th className="text-right">EPC</th>
             </tr>
           </thead>
           <tbody>
@@ -151,6 +208,9 @@ export default function AreaPage({
                 <td className="text-right tabular-nums">
                   £{c.price.toLocaleString("en-GB")}
                 </td>
+                <td className="text-right tabular-nums">{c.floor_area ? `${Math.round(c.floor_area)} m²` : "—"}</td>
+                <td className="text-right tabular-nums">{c.ppsm ? gbp(c.ppsm) : "—"}</td>
+                <td className="text-right">{c.epc_rating ?? "—"}</td>
               </tr>
             ))}
           </tbody>

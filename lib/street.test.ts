@@ -8,6 +8,7 @@ import {
   getStreetsInBorough,
   normalisePostcode,
   pricePercentile,
+  fairRange,
   resetStreetDb,
 } from "./street";
 
@@ -21,23 +22,23 @@ function buildFixture(): string {
   d.exec(`CREATE TABLE meta(key TEXT, value TEXT);
     CREATE TABLE postcodes(postcode TEXT, sector TEXT, lsoa TEXT, msoa TEXT, lad TEXT, lat REAL, lon REAL, street_key TEXT);
     CREATE INDEX ix_pc ON postcodes(postcode);
-    CREATE TABLE area_stats(level TEXT, code TEXT, name TEXT, lad TEXT, lad_nm TEXT, n_36m INTEGER, med_36m REAL, p25_36m REAL, p75_36m REAL, n_flat INTEGER, med_flat REAL, n_house INTEGER, med_house REAL, n_12m INTEGER, n_prev12 INTEGER, lat REAL, lon REAL, reliable INTEGER, rs_pairs REAL, rs_chg_1y REAL, rs_chg_5y REAL);
+    CREATE TABLE area_stats(level TEXT, code TEXT, name TEXT, lad TEXT, lad_nm TEXT, n_36m INTEGER, med_36m REAL, p25_36m REAL, p75_36m REAL, n_flat INTEGER, med_flat REAL, n_house INTEGER, med_house REAL, p25_flat REAL, p75_flat REAL, p25_house REAL, p75_house REAL, n_ppsm INTEGER, med_ppsm REAL, n_ppsm_flat INTEGER, med_ppsm_flat REAL, p25_ppsm_flat REAL, p75_ppsm_flat REAL, n_ppsm_house INTEGER, med_ppsm_house REAL, p25_ppsm_house REAL, p75_ppsm_house REAL, n_12m INTEGER, n_prev12 INTEGER, lat REAL, lon REAL, reliable INTEGER, rs_pairs REAL, rs_chg_1y REAL, rs_chg_5y REAL);
     CREATE INDEX ix_area ON area_stats(level, code);
-    CREATE TABLE sales(txn_id TEXT, date TEXT, price INTEGER, postcode TEXT, type TEXT, new_build INTEGER, tenure TEXT, address TEXT, street_key TEXT, sector TEXT, lsoa TEXT, msoa TEXT, lad TEXT, lat REAL, lon REAL);
+    CREATE TABLE sales(txn_id TEXT, date TEXT, price INTEGER, postcode TEXT, type TEXT, new_build INTEGER, tenure TEXT, address TEXT, street_key TEXT, sector TEXT, lsoa TEXT, msoa TEXT, lad TEXT, lat REAL, lon REAL, floor_area REAL, ppsm REAL, epc_rating TEXT);
     CREATE INDEX ix_sales_sector ON sales(sector, date);
     CREATE INDEX ix_sales_street ON sales(street_key);
     CREATE INDEX ix_sales_pc ON sales(postcode);`);
   d.exec(`INSERT INTO meta VALUES ('asof','2026-09-30'),('level_months','36'),('min_n','10'),('min_pairs','60'),('source','test fixture');`);
   // Thin street (n_flat=2 < 10) → falls back to sector (n_flat=50).
   d.exec(`INSERT INTO postcodes VALUES ('AB1 2CD','AB1 2','E01000001','E02000001','E09000001',51.5,-0.1,'AB1|THIN STREET');`);
-  d.exec(`INSERT INTO area_stats VALUES
+  d.exec(`INSERT INTO area_stats(level,code,name,lad,lad_nm,n_36m,med_36m,p25_36m,p75_36m,n_flat,med_flat,n_house,med_house,n_12m,n_prev12,lat,lon,reliable,rs_pairs,rs_chg_1y,rs_chg_5y) VALUES
     ('street','AB1|THIN STREET','Thin Street, AB1','E09000001','City',5,500000,400000,600000,2,450000,3,550000,1,1,51.5,-0.1,0,NULL,NULL,NULL),
     ('sector','AB1 2','AB1 2','E09000001','City',60,520000,420000,620000,50,480000,10,600000,20,18,51.5,-0.1,1,NULL,NULL,NULL),
     ('lsoa','E01000001','LSOA 1','E09000001','City',30,510000,410000,610000,20,470000,10,590000,9,8,51.5,-0.1,1,NULL,NULL,NULL),
     ('msoa','E02000001','MSOA 1','E09000001','City',90,530000,430000,630000,60,490000,30,610000,30,28,51.5,-0.1,1,70,0.05,0.12),
     ('borough','E09000001','City of London','E09000001','City',200,540000,440000,640000,120,500000,80,620000,70,65,51.5,-0.1,1,500,-0.01,0.03);`);
   const ins = d.prepare(
-    "INSERT INTO sales VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    "INSERT INTO sales(txn_id,date,price,postcode,type,new_build,tenure,address,street_key,sector,lsoa,msoa,lad,lat,lon) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
   );
   for (let i = 0; i < 50; i++) {
     ins.run(
@@ -152,5 +153,17 @@ describe("real street.db (when present)", () => {
     expect(r.chosenLevel).toBe("street");
     expect(r.chosenN).toBeGreaterThanOrEqual(10);
     expect(r.chosenMedian).not.toBeNull();
+  });
+});
+
+describe("fairRange", () => {
+  const q = { p25: 6000, med: 7500, p75: 9000 };
+  it("multiplies £/sq m quartiles by floor area, rounded to £1,000", () => {
+    expect(fairRange(70, q)).toEqual({ sqm: 70, low: 420000, mid: 525000, high: 630000 });
+  });
+  it("returns null for missing or implausible inputs", () => {
+    expect(fairRange(null, q)).toBeNull();
+    expect(fairRange(5, q)).toBeNull();
+    expect(fairRange(70, { p25: null, med: 7500, p75: 9000 })).toBeNull();
   });
 });

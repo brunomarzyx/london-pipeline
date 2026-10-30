@@ -7,7 +7,9 @@ export async function GET(req: Request) {
   const typeParam = url.searchParams.get("type");
   const type =
     typeParam === "flat" || typeParam === "house" ? typeParam : undefined;
-  const r = getAreaComps(postcode, type);
+  const sqmRaw = Number(url.searchParams.get("sqm"));
+  const sqm = Number.isFinite(sqmRaw) && sqmRaw > 0 ? sqmRaw : null;
+  const r = getAreaComps(postcode, type, sqm);
   if ("error" in r) {
     if (r.error === "invalid")
       return NextResponse.json(

@@ -21,6 +21,21 @@ export interface CompSale {
   postcode: string;
   lat: number | null;
   lon: number | null;
+  floor_area?: number | null;
+  ppsm?: number | null;
+  epc_rating?: string | null;
+}
+
+/** £ per sq m view: price per floor area from Land Registry sales matched to EPC certificates. */
+export interface PpsmView {
+  level: string;
+  name: string;
+  n: number;
+  median: number | null;
+  p25: number | null;
+  p75: number | null;
+  /** Only when a floor area was given: p25/median/p75 £/sq m x sqm, rounded to £1,000. */
+  fairRange: { sqm: number; low: number; mid: number; high: number } | null;
 }
 
 export interface AreaComps {
@@ -38,6 +53,7 @@ export interface AreaComps {
   comps: CompSale[];
   asof: string;
   source: string;
+  ppsm: PpsmView | null;
 }
 
 let db: Database.Database | null = null;
@@ -105,6 +121,16 @@ interface AreaRow {
   p75_flat: number | null;
   p25_house: number | null;
   p75_house: number | null;
+  n_ppsm_flat: number | null;
+  med_ppsm_flat: number | null;
+  p25_ppsm_flat: number | null;
+  p75_ppsm_flat: number | null;
+  n_ppsm_house: number | null;
+  med_ppsm_house: number | null;
+  p25_ppsm_house: number | null;
+  p75_ppsm_house: number | null;
+  n_ppsm: number | null;
+  med_ppsm: number | null;
   rs_chg_1y: number | null;
   rs_chg_5y: number | null;
 }
@@ -137,6 +163,25 @@ function qFor(r: AreaRow, type: CompType | null): [number | null, number | null]
   return [r.p25_36m, r.p75_36m];
 }
 
+/** £/sq m stats for a type; untyped falls back to all-types n and median (no quartiles stored). */
+function ppsmFor(r: AreaRow, type: CompType | null): { n: number; med: number | null; p25: number | null; p75: number | null } {
+  if (type === "flat") return { n: r.n_ppsm_flat ?? 0, med: r.med_ppsm_flat, p25: r.p25_ppsm_flat, p75: r.p75_ppsm_flat };
+  if (type === "house") return { n: r.n_ppsm_house ?? 0, med: r.med_ppsm_house, p25: r.p25_ppsm_house, p75: r.p75_ppsm_house };
+  return { n: r.n_ppsm ?? 0, med: r.med_ppsm, p25: null, p75: null };
+}
+
+const round1k = (x: number) => Math.round(x / 1000) * 1000;
+
+/** Pure: fair range for a floor area from £/sq m quartiles. Null unless all three are known and sqm is plausible. */
+export function fairRange(
+  sqm: number | null | undefined,
+  q: { p25: number | null; med: number | null; p75: number | null },
+): { sqm: number; low: number; mid: number; high: number } | null {
+  if (sqm == null || !Number.isFinite(sqm) || sqm < 15 || sqm > 1000) return null;
+  if (q.p25 == null || q.med == null || q.p75 == null) return null;
+  return { sqm, low: round1k(q.p25 * sqm), mid: round1k(q.med * sqm), high: round1k(q.p75 * sqm) };
+}
+
 function minN(d: Database.Database): number {
   const row = d
     .prepare("SELECT value FROM meta WHERE key='min_n'")
@@ -153,6 +198,7 @@ function minN(d: Database.Database): number {
 export function getAreaComps(
   postcode: string,
   type?: CompType | null,
+  sqm?: number | null,
 ): AreaComps | { error: "invalid" } | { error: "not_found" } {
   const pc = normalisePostcode(postcode);
   if (!pc) return { error: "invalid" };
@@ -218,7 +264,7 @@ export function getAreaComps(
   if (chosenLevel === "street") {
     comps = d
       .prepare(
-        `SELECT address, date, price, postcode, lat, lon FROM sales WHERE street_key=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
+        `SELECT address, date, price, postcode, lat, lon, floor_area, ppsm, epc_rating FROM sales WHERE street_key=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
       )
       .all(prow.street_key) as CompSale[];
   } else {
@@ -226,9 +272,18 @@ export function getAreaComps(
     // p25/med/p75 already summarise the wider area.
     comps = d
       .prepare(
-        `SELECT address, date, price, postcode, lat, lon FROM sales WHERE sector=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
+        `SELECT address, date, price, postcode, lat, lon, floor_area, ppsm, epc_rating FROM sales WHERE sector=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
       )
       .all(prow.sector) as CompSale[];
+  }
+
+  // £/sq m: finest level with enough EPC-matched sales of this type (same ladder rule, its own n).
+  let ppsm: PpsmView | null = null;
+  const pIdx = rows.findIndex(({ row }) => row && ppsmFor(row, t).n >= minNVal);
+  if (pIdx !== -1) {
+    const pr = rows[pIdx].row!;
+    const q = ppsmFor(pr, t);
+    ppsm = { level: rows[pIdx].level, name: pr.name, n: q.n, median: q.med, p25: q.p25, p75: q.p75, fairRange: fairRange(sqm, q) };
   }
 
   return {
@@ -246,6 +301,7 @@ export function getAreaComps(
     comps,
     asof,
     source,
+    ppsm,
   };
 }
 

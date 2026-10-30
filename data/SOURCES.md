@@ -45,3 +45,10 @@ City series used (all nominal; `lib/global.ts` deflates with national CPI into r
 Paris and Berlin use the euro-area (XM) policy rate. The 10-year peak for Tel Aviv uses available history only (series starts 2017).
 
 Checked but not included: Dubai (city series ends 2024-04 and BIS has no UAE policy rate); New York (BIS US city series `Q:US:3:2:1:3:6:0` does not name the metro, so it cannot be labelled); Singapore, Istanbul, Seoul, Mexico City (series found, cut to keep 8 cities with Europe/Middle East/North America/South America/Asia-Pacific spread).
+
+## Floor areas (£ per sq m) — MHCLG domestic EPC register
+- Source: get-energy-performance-data.communities.gov.uk, domestic full load (CSV zip, last updated 13 Oct 2026), OGL. Bearer token in `.env` as `EPC_TOKEN` (never committed).
+- `scripts/street/04_epc_fetch.py` streams the 8.3 GB zip with HTTP range requests and keeps London rows only (local_authority E09*): 4,601,394 certificates, 2008–2026. The zip is never written to disk.
+- `scripts/street/05_epc_join.py` matches Land Registry sales to certificates on postcode + house/flat numbers, tie-broken by address-word overlap; floor area from the certificate closest in time to the sale. Areas outside 15–1,000 sq m and prices outside £1,500–£60,000/sq m are dropped.
+- Match rate (all London sales 2016–Sep 2026): 90.1% overall; flats 91.8%, terraced 97.2%, semis 98.1%, detached 96.6%, "other" 25% (mostly non-standard/commercial). 99% of matches share at least half their address words.
+- Limits: floor area is as assessed at the certificate date, so later extensions can be missed; unmatched sales are excluded from £/sq m but still count in price medians.

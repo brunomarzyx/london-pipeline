@@ -33,6 +33,7 @@ const CompsArgs = z.object({
   postcode: z.string().min(1).max(10),
   type: z.enum(["flat", "house"]).optional(),
   price: z.number().int().positive().max(100_000_000).optional(),
+  sqm: z.number().positive().max(1000).optional(),
 });
 
 const ModelReply = z.union([
@@ -91,7 +92,7 @@ export function runTool(name: string, args: unknown): string {
   if (name === "get_area_comps") {
     const parsed = CompsArgs.safeParse(args);
     if (!parsed.success) return `error: invalid args (${parsed.error.message})`;
-    const r = getAreaComps(parsed.data.postcode, parsed.data.type ?? null);
+    const r = getAreaComps(parsed.data.postcode, parsed.data.type ?? null, parsed.data.sqm ?? null);
     if ("error" in r)
       return JSON.stringify({ postcode: parsed.data.postcode, comps: null, note: r.error });
     const prices = r.comps.map((c) => c.price);
@@ -111,6 +112,18 @@ export function runTool(name: string, args: unknown): string {
       momentumFrom: r.momentum.from,
       askingPrice: parsed.data.price ?? null,
       askingPercentile: pct,
+      ppsmLevel: r.ppsm?.level ?? null,
+      ppsmName: r.ppsm?.name ?? null,
+      ppsmN: r.ppsm?.n ?? null,
+      ppsmMedian: r.ppsm?.median != null ? Math.round(r.ppsm.median) : null,
+      ppsmP25: r.ppsm?.p25 != null ? Math.round(r.ppsm.p25) : null,
+      ppsmP75: r.ppsm?.p75 != null ? Math.round(r.ppsm.p75) : null,
+      floorArea: parsed.data.sqm ?? null,
+      fairLow: r.ppsm?.fairRange?.low ?? null,
+      fairMid: r.ppsm?.fairRange?.mid ?? null,
+      fairHigh: r.ppsm?.fairRange?.high ?? null,
+      askingPpsm:
+        parsed.data.price != null && parsed.data.sqm ? Math.round(parsed.data.price / parsed.data.sqm) : null,
       asof: r.asof,
     });
   }
