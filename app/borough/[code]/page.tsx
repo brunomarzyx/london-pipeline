@@ -26,6 +26,13 @@ export default function BoroughPage({ params }: { params: { code: string } }) {
     { label: "Net build-up (3 FY)", value: d.netBuildup == null ? "no data" : fmtHomes(d.netBuildup).replace(" homes", "") },
     { label: "Supply pressure", value: fmtPressure(d.pressure) },
     { label: "Starts momentum", value: fmtPct(d.momentum == null ? null : d.momentum * 100) },
+    { label: "Avg monthly rent", value: fmtPrice(d.avgRent) },
+    { label: "Rent Δ 12m", value: fmtPct(d.rentChange) },
+    { label: "Gross yield", value: fmtPct(d.grossYield) },
+    { label: "Price-to-rent", value: d.priceToRent == null ? "no data" : `${d.priceToRent.toFixed(1)}×` },
+    { label: "Sales (latest 12m)", value: d.latestSales == null ? "no data" : d.latestSales.toLocaleString("en-GB") },
+    { label: "Sales Δ 2025 vs 2024", value: fmtPct(d.salesChange == null ? null : d.salesChange * 100) },
+    { label: "New-build share", value: fmtPct(d.newBuildShare == null ? null : d.newBuildShare * 100) },
   ];
   return (
     <main className="mx-auto max-w-5xl bg-slate-50 p-6 text-slate-900">

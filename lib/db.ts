@@ -1,8 +1,13 @@
 import Database from "better-sqlite3";
 import path from "node:path";
 import {
+  grossYield,
   netPipelineBuildup,
+  newBuildShare,
   priceChange12m,
+  priceToRent,
+  rentChange12m,
+  salesVolumeChange12m,
   startsMomentum,
   supplyPressureRatio,
 } from "./metrics";
@@ -15,6 +20,13 @@ export interface BoroughMetrics {
   netBuildup: number | null;
   pressure: number | null;
   momentum: number | null;
+  avgRent: number | null;
+  rentChange: number | null;
+  grossYield: number | null;
+  priceToRent: number | null;
+  latestSales: number | null;
+  salesChange: number | null;
+  newBuildShare: number | null;
 }
 
 const FY_WINDOW = ["2023-24", "2024-25", "2025-26"];
@@ -47,6 +59,23 @@ export function getAllMetrics(): BoroughMetrics[] {
   const priceStmt = d.prepare(
     "SELECT avg_price FROM prices WHERE borough_code=? AND month=?",
   );
+  const rentMax = (
+    d.prepare("SELECT MAX(month) AS m FROM rents").get() as { m: string }
+  ).m;
+  const [ry, rm] = rentMax.split("-").map(Number);
+  const rd = new Date(ry, rm - 1, 1);
+  rd.setMonth(rd.getMonth() - 12);
+  const rentAgo = `${rd.getFullYear()}-${String(rd.getMonth() + 1).padStart(2, "0")}`;
+  const rentStmt = d.prepare(
+    "SELECT avg_rent FROM rents WHERE borough_code=? AND month=?",
+  );
+  const volStmt = d.prepare(
+    "SELECT sales, new_build_sales AS nb FROM volumes WHERE borough_code=? AND year=?",
+  );
+  const volMax = (d.prepare("SELECT MAX(year) AS y FROM volumes").get() as {
+    y: string;
+  }).y;
+  const volPrior = String(Number(volMax) - 1);
   const fyStmt = d.prepare(
     `SELECT SUM(started_units) AS s, SUM(completed_units) AS c FROM pipeline
      WHERE borough_code=? AND period_type='FY' AND period IN ('2023-24','2024-25','2025-26')`,
@@ -69,16 +98,40 @@ export function getAllMetrics(): BoroughMetrics[] {
     const net = netPipelineBuildup(fy.s, fy.c);
     const avgAnnual =
       fy.c == null ? null : fy.c / FY_WINDOW.length;
+    const rent = rentStmt.get(b.code, rentMax) as
+      | { avg_rent: number | null }
+      | undefined;
+    const rentPrev = rentStmt.get(b.code, rentAgo) as
+      | { avg_rent: number | null }
+      | undefined;
+    const vol = volStmt.get(b.code, volMax) as
+      | { sales: number | null; nb: number | null }
+      | undefined;
+    const volPrev = volStmt.get(b.code, volPrior) as
+      | { sales: number | null; nb: number | null }
+      | undefined;
+    const latestPrice = latest?.avg_price ?? null;
+    const avgRent = rent?.avg_rent ?? null;
     return {
       ...b,
-      latestPrice: latest?.avg_price ?? null,
+      latestPrice,
       priceChange: priceChange12m(
-        latest?.avg_price ?? null,
+        latestPrice,
         prev?.avg_price ?? null,
       ),
       netBuildup: net,
       pressure: supplyPressureRatio(net, avgAnnual),
       momentum: startsMomentum(lq.s, pq.s),
+      avgRent,
+      rentChange: rentChange12m(avgRent, rentPrev?.avg_rent ?? null),
+      grossYield: grossYield(avgRent, latestPrice),
+      priceToRent: priceToRent(latestPrice, avgRent),
+      latestSales: vol?.sales ?? null,
+      salesChange: salesVolumeChange12m(
+        vol?.sales ?? null,
+        volPrev?.sales ?? null,
+      ),
+      newBuildShare: newBuildShare(vol?.nb ?? null, vol?.sales ?? null),
     };
   });
 }

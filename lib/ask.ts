@@ -6,7 +6,17 @@ import { getAllMetrics, getBoroughDetail } from "./db";
 
 export const MAX_TOOL_ROUNDS = 4;
 
-const MetricKey = z.enum(["priceChange", "netBuildup", "pressure", "momentum"]);
+const MetricKey = z.enum([
+  "priceChange",
+  "netBuildup",
+  "pressure",
+  "momentum",
+  "grossYield",
+  "priceToRent",
+  "rentChange",
+  "salesChange",
+  "newBuildShare",
+]);
 type MetricKey = z.infer<typeof MetricKey>;
 
 const ListArgs = z.object({});
@@ -53,7 +63,7 @@ export function runTool(name: string, args: unknown): string {
       .map((b) => ({
         code: b.code,
         name: b.name,
-        value: b[metric] == null ? null : Math.round(b[metric] * 100) / 100,
+        value: b[metric] == null ? null : Math.round(b[metric] * 10000) / 10000,
       }))
       .sort((a, b) => {
         if (a.value == null && b.value == null) return 0;
@@ -69,7 +79,7 @@ export function runTool(name: string, args: unknown): string {
 
 function roundMetrics(d: ReturnType<typeof getBoroughDetail>): object | null {
   if (!d) return null;
-  const r = (v: number | null) => (v == null ? null : Math.round(v * 100) / 100);
+  const r = (v: number | null) => (v == null ? null : Math.round(v * 10000) / 10000);
   return {
     code: d.code,
     name: d.name,
@@ -78,6 +88,13 @@ function roundMetrics(d: ReturnType<typeof getBoroughDetail>): object | null {
     netBuildup: d.netBuildup,
     pressure: r(d.pressure),
     momentum: r(d.momentum),
+    avgRent: d.avgRent == null ? null : Math.round(d.avgRent),
+    rentChange: r(d.rentChange),
+    grossYield: r(d.grossYield),
+    priceToRent: r(d.priceToRent),
+    latestSales: d.latestSales,
+    salesChange: r(d.salesChange),
+    newBuildShare: r(d.newBuildShare),
   };
 }
 

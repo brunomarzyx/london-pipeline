@@ -100,6 +100,88 @@ interface PipelineRow {
   completions: number | null;
 }
 
+interface RentRow {
+  code: string;
+  borough: string;
+  month: string;
+  avg: number | null;
+}
+
+function excelSerialToMonth(serial: number): string {
+  const d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+function readRents(): RentRow[] {
+  const wb = XLSX.readFile(path.join(RAW, "PIPR-monthly-2026-10.xlsx"));
+  const grid = XLSX.utils.sheet_to_json<Cell[]>(wb.Sheets["Table 1"], {
+    header: 1,
+    defval: null,
+  });
+  const hdr = grid[2];
+  const periodCol = hdr.indexOf("Time period");
+  const codeCol = hdr.indexOf("Area code");
+  const nameCol = hdr.indexOf("Area name");
+  const rentCol = hdr.indexOf("Rental price");
+  const byPeriod = new Map<number, RentRow[]>();
+  for (const r of grid.slice(3)) {
+    if (typeof r[periodCol] !== "number") continue;
+    const code = typeof r[codeCol] === "string" ? r[codeCol].trim() : "";
+    if (!/^E090\d{5}$/.test(code)) continue;
+    const serial = r[periodCol] as number;
+    let list = byPeriod.get(serial);
+    if (!list) {
+      list = [];
+      byPeriod.set(serial, list);
+    }
+    list.push({
+      code,
+      borough: String(r[nameCol] ?? "").trim(),
+      month: excelSerialToMonth(serial),
+      avg: toNumberOrNull(r[rentCol]),
+    });
+  }
+  const serials = [...byPeriod.keys()].sort((a, b) => a - b);
+  const latest = serials[serials.length - 1];
+  const ago = serials[serials.length - 13];
+  return [...byPeriod.get(latest)!, ...byPeriod.get(ago)!];
+}
+
+interface VolumeRow {
+  code: string;
+  borough: string;
+  year: string;
+  sales: number;
+  newBuild: number;
+}
+
+async function readVolumes(): Promise<VolumeRow[]> {
+  const text = await fs.readFile(
+    path.join(RAW, "price-paid-london-2024-2025.csv"),
+    "utf8",
+  );
+  const byKey = new Map<string, VolumeRow>();
+  const lines = text.split("\n");
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const m = line.match(/^(\d{4}-\d{2}-\d{2}),(\d+),"(.+)",([YN])$/);
+    if (!m) throw new Error(`bad price-paid row ${i + 1}`);
+    const year = m[1].slice(0, 4);
+    const code = normaliseBoroughCode(m[3]);
+    if (!code) throw new Error(`unknown district "${m[3]}"`);
+    const key = `${code}|${year}`;
+    let e = byKey.get(key);
+    if (!e) {
+      e = { code, borough: m[3], year, sales: 0, newBuild: 0 };
+      byKey.set(key, e);
+    }
+    e.sales++;
+    if (m[4] === "Y") e.newBuild++;
+  }
+  return [...byKey.values()];
+}
+
 function readSheet(
   wb: WorkBook,
   sheet: string,
@@ -164,16 +246,24 @@ async function main(): Promise<void> {
   for (const sh of Q_SHEETS)
     pipeline.push(...readSheet(wbQuarterly, sh, qPeriod(sh), "Q"));
 
+  const rents = readRents();
+  const volumes = await readVolumes();
+
   const db = new Database(DB_PATH);
   db.exec(`DROP TABLE IF EXISTS prices; DROP TABLE IF EXISTS pipeline;
+    DROP TABLE IF EXISTS rents; DROP TABLE IF EXISTS volumes;
     CREATE TABLE prices (borough_code TEXT, borough TEXT, month TEXT, avg_price REAL);
-    CREATE TABLE pipeline (borough_code TEXT, borough TEXT, period TEXT, period_type TEXT, started_units INTEGER, completed_units INTEGER);`);
+    CREATE TABLE pipeline (borough_code TEXT, borough TEXT, period TEXT, period_type TEXT, started_units INTEGER, completed_units INTEGER);
+    CREATE TABLE rents (borough_code TEXT, borough TEXT, month TEXT, avg_rent REAL);
+    CREATE TABLE volumes (borough_code TEXT, borough TEXT, year TEXT, sales INTEGER, new_build_sales INTEGER);`);
   const insertPrice = db.prepare(
     "INSERT INTO prices VALUES (?, ?, ?, ?)",
   );
   const insertPipe = db.prepare(
     "INSERT INTO pipeline VALUES (?, ?, ?, ?, ?, ?)",
   );
+  const insertRent = db.prepare("INSERT INTO rents VALUES (?, ?, ?, ?)");
+  const insertVol = db.prepare("INSERT INTO volumes VALUES (?, ?, ?, ?, ?)");
   const tx = db.transaction(() => {
     for (const p of prices)
       insertPrice.run(p.code, p.borough, p.month, p.avg);
@@ -186,6 +276,9 @@ async function main(): Promise<void> {
         p.starts,
         p.completions,
       );
+    for (const r of rents) insertRent.run(r.code, r.borough, r.month, r.avg);
+    for (const v of volumes)
+      insertVol.run(v.code, v.borough, v.year, v.sales, v.newBuild);
   });
   tx();
 
@@ -197,6 +290,14 @@ async function main(): Promise<void> {
   ).n;
   console.log(`prices: ${priceCount} rows`);
   console.log(`pipeline: ${pipeCount} rows`);
+  for (const t of ["rents", "volumes"])
+    console.log(
+      `${t}: ${(db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get() as { n: number }).n} rows`,
+    );
+  for (const t of ["rents", "volumes"])
+    console.log(
+      `${t} boroughs: ${(db.prepare(`SELECT COUNT(DISTINCT borough_code) AS n FROM ${t}`).get() as { n: number }).n}`,
+    );
 
   // Top-5 boroughs by supply pressure over the last 3 financial years.
   const byBorough = new Map<

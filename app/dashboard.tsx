@@ -10,7 +10,7 @@ import {
 } from "@/lib/cycle-phase";
 import AskBox from "./ask-box";
 
-export type MetricKey = "priceChange" | "netBuildup" | "pressure" | "momentum";
+export type MetricKey = "priceChange" | "netBuildup" | "pressure" | "momentum" | "grossYield" | "rentChange" | "salesChange";
 export type LayerKey = MetricKey | "phase";
 
 const PHASE_ORDER: CyclePhase[] = ["hypersupply", "expansion", "recession", "recovery", "unknown"];
@@ -24,6 +24,9 @@ const METRICS: { key: MetricKey; label: string; fmt: (v: number | null) => strin
   { key: "netBuildup", label: "Net build-up", fmt: (v) => (v == null ? "no data" : Math.round(v).toLocaleString()) },
   { key: "pressure", label: "Supply pressure", fmt: (v) => (v == null ? "no data" : `${v.toFixed(2)}×`) },
   { key: "momentum", label: "Starts momentum", fmt: (v) => (v == null ? "no data" : `${(v * 100).toFixed(1)}%`) },
+  { key: "grossYield", label: "Gross yield", fmt: (v) => (v == null ? "no data" : `${v.toFixed(1)}%`) },
+  { key: "rentChange", label: "Rent Δ 12m %", fmt: (v) => (v == null ? "no data" : `${v.toFixed(1)}%`) },
+  { key: "salesChange", label: "Sales Δ 2025 vs 2024", fmt: (v) => (v == null ? "no data" : `${(v * 100).toFixed(1)}%`) },
 ];
 
 const COLORS = ["#e0f2fe", "#7dd3fc", "#0284c7", "#0c4a6e", "#020617"];
