@@ -7,3 +7,5 @@ data/raw/*.zip
 data/raw/boundaries/
 *.db
 .DS_Store
+
+tsconfig.tsbuildinfo
