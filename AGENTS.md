@@ -18,6 +18,7 @@
 - Next.js (App Router) + TypeScript (strict), Tailwind, Leaflet with OpenStreetMap tiles, recharts for charts, zod for validation, SQLite via `better-sqlite3`, Vitest for tests.
 - Meta Model API through the `openai` npm SDK with `baseURL: process.env.META_BASE_URL` (default `https://api.meta.ai/v1`), `apiKey: process.env.MODEL_API_KEY`, and model `process.env.META_MODEL` (default `muse-spark-1.3`).
 - All Meta calls go through **one wrapper**, `lib/meta.ts`. It logs prompt, completion and cached tokens per call to `logs/usage.jsonl`, and it supports a `MOCK_META=1` mode that returns fixtures, so the UI and tests run without spending credits.
+- Muse Spark always reasons, and reasoning tokens count toward `max_tokens`. Never set `max_tokens` below 1024 (an 'ok' test with 20 came back empty). Verified live on 30 Oct: `POST https://api.meta.ai/v1/chat/completions` with `muse-spark-1.3` works with our key.
 
 ## 4. Coding rules
 - Write the smallest code that passes the acceptance check. No speculative abstractions, no extra libraries without a one-line reason.
