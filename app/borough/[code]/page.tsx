@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBoroughDetail } from "@/lib/db";
 import Charts from "./charts";
+import BriefCard from "./brief-card";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export default function BoroughPage({ params }: { params: { code: string } }) {
           </div>
         ))}
       </div>
+      <BriefCard code={d.code} />
       <div className="mt-6">
         <Charts detail={d} />
       </div>

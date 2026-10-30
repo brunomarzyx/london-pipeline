@@ -49,6 +49,10 @@ describe("startsMomentum", () => {
   it("returns null when the prior period is zero", () => {
     expect(startsMomentum(1200, 0)).toBeNull();
   });
+  it("returns null when the prior base is too small to be meaningful", () => {
+    expect(startsMomentum(1530, 30)).toBeNull();
+    expect(startsMomentum(150, 100)).toBeCloseTo(0.5);
+  });
   it("returns null when either value is null", () => {
     expect(startsMomentum(null, 1000)).toBeNull();
     expect(startsMomentum(1200, null)).toBeNull();

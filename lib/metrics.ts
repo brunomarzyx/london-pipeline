@@ -29,11 +29,15 @@ export function supplyPressureRatio(
   return netBuildup / avgAnnualCompletions;
 }
 
-/** Starts momentum = latest 4Q starts / prior 4Q starts − 1. */
+/** Below this many prior-4Q starts, a % change is noise (e.g. 30 → 1,530 = +5,000%). */
+export const MIN_MOMENTUM_BASE = 100;
+
+/** Starts momentum = latest 4Q starts / prior 4Q starts − 1; null when the prior base is under MIN_MOMENTUM_BASE units. */
 export function startsMomentum(
   latest4q: number | null,
   prior4q: number | null,
 ): number | null {
-  if (latest4q == null || prior4q == null || prior4q === 0) return null;
+  if (latest4q == null || prior4q == null || prior4q < MIN_MOMENTUM_BASE)
+    return null;
   return latest4q / prior4q - 1;
 }

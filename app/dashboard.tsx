@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { BoroughMetrics } from "@/lib/db";
+import AskBox from "./ask-box";
 
 export type MetricKey = "priceChange" | "netBuildup" | "pressure" | "momentum";
 
@@ -124,7 +125,9 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
       <header className="flex flex-wrap items-center gap-3 border-b border-slate-800 px-5 py-3">
         <h1 className="text-lg font-semibold tracking-tight">London Pipeline</h1>
         <span className="text-sm text-slate-400">supply vs price by borough</span>
-        <div className="ml-auto flex gap-1 rounded-full bg-slate-900 p-1">
+        <div className="ml-auto flex items-center gap-2">
+          <AskBox />
+          <div className="flex gap-1 rounded-full bg-slate-900 p-1">
           {METRICS.map((m) => (
             <button
               key={m.key}
@@ -134,6 +137,7 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
               {m.label}
             </button>
           ))}
+          </div>
         </div>
       </header>
       <div className="flex min-h-0 flex-1">

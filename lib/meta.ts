@@ -11,6 +11,7 @@ export interface ChatOptions {
   system?: string;
   maxTokens?: number;
   fixture?: string;
+  effort?: "low" | "medium" | "high";
 }
 
 export interface UsageRecord {
@@ -28,6 +29,8 @@ function client() {
   return new OpenAI({
     baseURL: BASE_URL,
     apiKey: process.env.MODEL_API_KEY ?? "",
+    // Global fetch honors NODE_USE_ENV_PROXY, so calls work behind a proxy.
+    fetch: (...args: Parameters<typeof fetch>) => fetch(...args),
   });
 }
 
@@ -52,7 +55,8 @@ export async function chat(
   userMessage: string,
   opts: ChatOptions = {},
 ): Promise<{ reply: string; usage: UsageRecord }> {
-  const maxTokens = Math.max(opts.maxTokens ?? 1024, 1024);
+  // Reasoning tokens count against max_tokens; 1024 left Brief replies empty.
+  const maxTokens = Math.max(opts.maxTokens ?? 4096, 4096);
   let reply: string;
   let cached = 0;
   let promptTokens = 0;
@@ -64,6 +68,9 @@ export async function chat(
     const res = await client().chat.completions.create({
       model: MODEL,
       max_tokens: maxTokens,
+      ...(opts.effort
+        ? { reasoning_effort: opts.effort } as Record<string, unknown>
+        : {}),
       messages: [
         ...(opts.system ? [{ role: "system" as const, content: opts.system }] : []),
         { role: "user" as const, content: userMessage },
@@ -101,7 +108,7 @@ export async function chatJSON<T>(
   const parsed = schema.safeParse(tryJSON(first.reply));
   if (parsed.success) return parsed.data;
   const retry = await chat(
-    `The previous reply was not valid JSON for the schema: ${parsed.error.message}. Reply with a single JSON object only, no other text.`,
+    `${userMessage}\n\nThe previous reply was not valid JSON for the schema: ${parsed.error.message}. Reply with a single JSON object only, no other text.`,
     { ...opts, system },
   );
   const second = schema.safeParse(tryJSON(retry.reply));

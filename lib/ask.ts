@@ -1,0 +1,207 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { z } from "zod";
+import { chat } from "./meta";
+import { getAllMetrics, getBoroughDetail } from "./db";
+
+export const MAX_TOOL_ROUNDS = 4;
+
+const MetricKey = z.enum(["priceChange", "netBuildup", "pressure", "momentum"]);
+type MetricKey = z.infer<typeof MetricKey>;
+
+const ListArgs = z.object({});
+const GetArgs = z.object({ code: z.string().min(1).max(12) });
+const RankArgs = z.object({
+  metric: MetricKey,
+  n: z.number().int().min(1).max(33),
+  order: z.enum(["desc", "asc"]),
+});
+
+const ModelReply = z.union([
+  z.object({
+    type: z.literal("tool_call"),
+    name: z.enum(["list_boroughs", "get_borough_metrics", "rank_boroughs"]),
+    args: z.unknown(),
+  }),
+  z.object({ type: z.literal("final"), answer: z.string().min(1).max(3000) }),
+]);
+
+export function runTool(name: string, args: unknown): string {
+  if (name === "list_boroughs") {
+    const parsed = ListArgs.safeParse(args ?? {});
+    if (!parsed.success) return `error: invalid args (${parsed.error.message})`;
+    const all = getAllMetrics();
+    return JSON.stringify(all.map((b) => ({ code: b.code, name: b.name })));
+  }
+  if (name === "get_borough_metrics") {
+    const parsed = GetArgs.safeParse(args);
+    if (!parsed.success) return `error: invalid args (${parsed.error.message})`;
+    const d = getBoroughDetail(parsed.data.code);
+    if (!d)
+      return JSON.stringify({
+        code: parsed.data.code,
+        metrics: null,
+        note: "unknown borough code",
+      });
+    return JSON.stringify(roundMetrics(d));
+  }
+  if (name === "rank_boroughs") {
+    const parsed = RankArgs.safeParse(args);
+    if (!parsed.success) return `error: invalid args (${parsed.error.message})`;
+    const { metric, n, order } = parsed.data;
+    const rows = getAllMetrics()
+      .map((b) => ({
+        code: b.code,
+        name: b.name,
+        value: b[metric] == null ? null : Math.round(b[metric] * 100) / 100,
+      }))
+      .sort((a, b) => {
+        if (a.value == null && b.value == null) return 0;
+        if (a.value == null) return 1;
+        if (b.value == null) return -1;
+        return order === "desc" ? b.value - a.value : a.value - b.value;
+      })
+      .slice(0, n);
+    return JSON.stringify(rows);
+  }
+  return `error: unknown tool "${name}"`;
+}
+
+function roundMetrics(d: ReturnType<typeof getBoroughDetail>): object | null {
+  if (!d) return null;
+  const r = (v: number | null) => (v == null ? null : Math.round(v * 100) / 100);
+  return {
+    code: d.code,
+    name: d.name,
+    latestPrice: d.latestPrice == null ? null : Math.round(d.latestPrice),
+    priceChange: r(d.priceChange),
+    netBuildup: d.netBuildup,
+    pressure: r(d.pressure),
+    momentum: r(d.momentum),
+  };
+}
+
+function tryJSON(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+/** First complete JSON object embedded anywhere in the reply (prose ignored). */
+export function extractJSON(text: string): unknown {
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] !== "{") continue;
+    let depth = 0;
+    let inStr = false;
+    let esc = false;
+    for (let j = i; j < text.length; j++) {
+      const c = text[j];
+      if (inStr) {
+        if (esc) esc = false;
+        else if (c === "\\") esc = true;
+        else if (c === '"') inStr = false;
+      } else if (c === '"') inStr = true;
+      else if (c === "{") depth++;
+      else if (c === "}") {
+        depth--;
+        if (depth === 0) {
+          try {
+            return JSON.parse(text.slice(i, j + 1));
+          } catch {
+            break;
+          }
+        }
+      }
+    }
+  }
+  return tryJSON(text);
+}
+
+/** One-line rendering of tool results for the forced fallback answer. */
+export function renderSummary(history: { name: string; result: string }[]): string {
+  if (!history.length) return "no tool results (data missing)";
+  return history
+    .map((h) => {
+      const parsed = tryJSON(h.result);
+      if (Array.isArray(parsed)) {
+        const top = parsed
+          .slice(0, 5)
+          .map((r) => `${r.name}: ${r.value ?? "no data"}`)
+          .join("; ");
+        return `${h.name} → ${top || "empty ranking"}`;
+      }
+      if (parsed && typeof parsed === "object") {
+        const m = parsed as Record<string, unknown>;
+        if (m.metrics === null)
+          return `${h.name}(${JSON.stringify((m as { code?: string }).code)}) → no data (${(m as { note?: string }).note ?? "missing"})`;
+        return `${h.name} → ${h.result}`;
+      }
+      return `${h.name} → ${h.result}`;
+    })
+    .join(" | ");
+}
+
+function mockFixtureFor(question: string, round: number): string {
+  if (/\[loop\]/.test(question)) return "ask-loop";
+  if (/approv|permission|consent/i.test(question)) return "ask-approvals";
+  return round === 0 ? "ask-tool" : "ask-final";
+}
+
+export async function askQuestion(
+  question: string,
+): Promise<{ answer: string; rounds: number }> {
+  const system = await fs.readFile(
+    path.join(process.cwd(), "prompts", "ask.md"),
+    "utf8",
+  );
+  const mock = process.env.MOCK_META === "1";
+  const history: { name: string; result: string }[] = [];
+
+  const transcript = (extra?: string) =>
+    [question]
+      .concat(
+        history.map((h) => `Tool ${h.name} returned: ${h.result}`),
+        extra ? [extra] : [],
+      )
+      .join("\n");
+
+  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    const fixture = mock ? mockFixtureFor(question, round) : undefined;
+    const { reply } = await chat(transcript(), {
+      system,
+      effort: "medium",
+      ...(fixture ? { fixture } : {}),
+    });
+    const withSummary = reply.replace("{{summary}}", renderSummary(history));
+    const parsed = ModelReply.safeParse(extractJSON(withSummary));
+    if (!parsed.success) {
+      history.push({
+        name: "parse_error",
+        result: `error: reply was not a valid tool_call/final object; answer with what you have`,
+      });
+      continue;
+    }
+    if (parsed.data.type === "final") return { answer: parsed.data.answer, rounds: round + 1 };
+    const result = runTool(parsed.data.name, parsed.data.args);
+    history.push({ name: parsed.data.name, result });
+  }
+
+  const fixture = mock ? "ask-final" : undefined;
+  const { reply } = await chat(
+    transcript(
+      "No more tool calls. Reply with {\"type\":\"final\",\"answer\":\"...\"} using only the numbers above; say what is missing.",
+    ),
+    { system, effort: "medium", ...(fixture ? { fixture } : {}) },
+  );
+  const parsed = ModelReply.safeParse(
+    extractJSON(reply.replace("{{summary}}", renderSummary(history))),
+  );
+  if (parsed.success && parsed.data.type === "final")
+    return { answer: parsed.data.answer, rounds: MAX_TOOL_ROUNDS + 1 };
+  return {
+    answer: `Based on the data: ${renderSummary(history)}. Approvals data is not in this build.`,
+    rounds: MAX_TOOL_ROUNDS + 1,
+  };
+}

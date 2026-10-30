@@ -1,0 +1,1 @@
+{"reply": "{\"type\": \"tool_call\", \"name\": \"rank_boroughs\", \"args\": {\"metric\": \"netBuildup\", \"n\": 5, \"order\": \"desc\"}}"}
