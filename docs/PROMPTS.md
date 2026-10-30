@@ -85,3 +85,48 @@ Stop with the handoff block.
 - It drifts or loops: press Esc, then `Stop. Re-read AGENTS.md §1. State in 2 lines what is failing and the single next fix.`
 - The session runs long: quit and start fresh with `Continue Phase <n>. Last handoff: <paste>`.
 - It tries a big refactor: `No. Smallest change that passes the acceptance check.`
+
+---
+## Upgrade phases (30 Oct, after research)
+
+### Phase 6 — Rents, yields and liquidity (London depth)
+```
+Phase 6. Add rents, yields and transaction volumes for all 33 boroughs, through the existing ingest → SQLite → metrics pattern.
+- Rents: ONS Price Index of Private Rents (PIPR) local-authority average monthly rent, latest available month and 12 months earlier. Download the official ONS file into data/raw, record URL, release date and licence (OGL) in data/SOURCES.md.
+- Volumes: HM Land Registry Price Paid Data yearly files (latest full 12 months vs prior 12), London boroughs only, count of sales and new-build share. Record URL and licence (OGL) in data/SOURCES.md. Don't commit files over 50 MB; keep only the London extract.
+- New metrics in lib/metrics.ts with tests: grossYield = 12 × avg monthly rent ÷ avg price; priceToRent = price ÷ (12 × rent); rentChange12m; salesVolumeChange12m; newBuildShare. Nulls stay null.
+- New map layers (Gross yield, Rent Δ 12m, Sales volume Δ) and the figures on borough pages; add the new metrics to the Ask London tools and the Brief input.
+- If a source can't be downloaded or its borough coverage is incomplete, stop and say exactly which, rather than substituting another source.
+Acceptance: tests green with MOCK_META=1; typecheck; show 3 boroughs' yield, rent change and volume change with the raw inputs so they can be checked.
+Stop with the handoff block.
+```
+
+### Phase 7 — Verified analyst memo (the Meta AI showcase)
+```
+Phase 7. A multi-step Muse Spark analyst that writes a one-page borough or two-borough memo, then proves its numbers.
+- lib/memo.ts: plan → call tools (existing + Phase 6 metrics) → draft memo JSON {title, call, evidence[], risks[], what_would_change_my_mind, market_read_across} → verifier pass: extract every number in the draft and match it against tool results; unmatched numbers are removed or flagged. Return verification stats (n numbers, n verified).
+- market_read_across is qualitative only (e.g. London-focused listed housebuilders and residential landlords, gilt yields): no prices, multiples or forecasts unless returned by a tool.
+- UI: "Write memo" button on borough pages and in Ask London ("compare X and Y"); show a "✓ 14/14 figures verified against source data" badge; each figure links to its source row; export to Markdown.
+- Also add the verifier to Ask London answers (badge only).
+- Fixtures for mock mode; tests for the verifier (catches an invented number; passes formatted numbers like £447,950 and −13.3%).
+Acceptance: tests green; 2 live memos (one single, one comparison) with their verification stats and usage log lines.
+Stop with the handoff block.
+```
+
+### Phase 8 — London vs the world's capitals
+```
+Phase 8. A "Global" tab comparing London's housing cycle with other capitals, using BIS residential property price statistics (data.bis.org, topic RPP) and BIS central bank policy rates.
+- Pick the 6–8 capitals or largest cities that have a city-level BIS series, aiming for spread across Europe, Middle East, North America, South America, Asia-Pacific; list which were found and which weren't in data/SOURCES.md. Use real (CPI-deflated) indices where available, otherwise label nominal.
+- Metrics per city: real price change 1y and 5y, distance from 10-year peak, policy rate and its 12-month change; a simple cycle phase from real price momentum and rate direction (named constants, tests).
+- UI: a ranked table plus small-multiple sparklines; London highlighted; clear note that supply data isn't comparable across cities so this view is prices and rates only.
+- Add a get_city_metrics tool so Ask London can answer "where is London in the global cycle?".
+Acceptance: tests green; show the city list with series IDs and latest dates; one live Ask answer comparing London with two other cities.
+Stop with the handoff block.
+```
+
+### Phase 9 — Demo polish
+```
+Phase 9. No new data. Landing headline that states the single strongest live finding; consistent formatting; mobile check; update README and docs/DEMO_SCRIPT.md for Phases 6–8 (demo order: map → borough memo with verified badge → global view → Ask London); key-leak check.
+Acceptance: clean build; secret scan empty.
+Stop with the handoff block.
+```
