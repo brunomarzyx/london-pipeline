@@ -9,6 +9,7 @@ import {
   type CyclePhase,
 } from "@/lib/cycle-phase";
 import AskBox from "./ask-box";
+import GlobalView from "./global-view";
 
 export type MetricKey = "priceChange" | "netBuildup" | "pressure" | "momentum" | "grossYield" | "rentChange" | "salesChange";
 export type LayerKey = MetricKey | "phase";
@@ -19,14 +20,15 @@ function phaseOf(m: BoroughMetrics): CyclePhase {
   return classifyCycle(m.priceChange, m.pressure, m.momentum);
 }
 
+const minus = (s: string) => s.replace("-", "−");
 const METRICS: { key: MetricKey; label: string; fmt: (v: number | null) => string }[] = [
-  { key: "priceChange", label: "Price Δ 12m %", fmt: (v) => (v == null ? "no data" : `${v.toFixed(1)}%`) },
+  { key: "priceChange", label: "Price Δ 12m %", fmt: (v) => (v == null ? "no data" : `${minus(v.toFixed(1))}%`) },
   { key: "netBuildup", label: "Net build-up", fmt: (v) => (v == null ? "no data" : Math.round(v).toLocaleString()) },
-  { key: "pressure", label: "Supply pressure", fmt: (v) => (v == null ? "no data" : `${v.toFixed(2)}×`) },
-  { key: "momentum", label: "Starts momentum", fmt: (v) => (v == null ? "no data" : `${(v * 100).toFixed(1)}%`) },
-  { key: "grossYield", label: "Gross yield", fmt: (v) => (v == null ? "no data" : `${v.toFixed(1)}%`) },
-  { key: "rentChange", label: "Rent Δ 12m %", fmt: (v) => (v == null ? "no data" : `${v.toFixed(1)}%`) },
-  { key: "salesChange", label: "Sales Δ 2025 vs 2024", fmt: (v) => (v == null ? "no data" : `${(v * 100).toFixed(1)}%`) },
+  { key: "pressure", label: "Supply pressure", fmt: (v) => (v == null ? "no data" : `${minus(v.toFixed(2))}×`) },
+  { key: "momentum", label: "Starts momentum", fmt: (v) => (v == null ? "no data" : `${minus((v * 100).toFixed(1))}%`) },
+  { key: "grossYield", label: "Gross yield", fmt: (v) => (v == null ? "no data" : `${minus(v.toFixed(1))}%`) },
+  { key: "rentChange", label: "Rent Δ 12m %", fmt: (v) => (v == null ? "no data" : `${minus(v.toFixed(1))}%`) },
+  { key: "salesChange", label: "Sales Δ 2025 vs 2024", fmt: (v) => (v == null ? "no data" : `${minus((v * 100).toFixed(1))}%`) },
 ];
 
 const COLORS = ["#e0f2fe", "#7dd3fc", "#0284c7", "#0c4a6e", "#020617"];
@@ -46,10 +48,11 @@ function colorFor(v: number | null, breaks: number[]): string {
   return COLORS[Math.min(i, COLORS.length - 1)];
 }
 
-export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
+export default function Dashboard({ metrics, headline }: { metrics: BoroughMetrics[]; headline?: string }) {
   const [metric, setMetric] = useState<LayerKey>("priceChange");
   const isPhase = metric === "phase";
   const [selected, setSelected] = useState<string | null>(null);
+  const [view, setView] = useState<"london" | "global">("london");
   const mapRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<any>(null);
   const mapObj = useRef<any>(null);
@@ -169,9 +172,20 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
       <header className="flex flex-wrap items-center gap-3 border-b border-slate-800 px-5 py-3">
         <h1 className="text-lg font-semibold tracking-tight">London Pipeline</h1>
         <span className="text-sm text-slate-400">supply vs price by borough</span>
+        <div className="flex gap-1 rounded-full bg-slate-900 p-1">
+          {(["london", "global"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => setView(v)}
+              className={`rounded-full px-3 py-1 text-sm capitalize ${view === v ? "bg-slate-100 font-medium text-slate-950" : "text-slate-300 hover:text-white"}`}
+            >
+              {v === "london" ? "London" : "Global"}
+            </button>
+          ))}
+        </div>
         <div className="ml-auto flex items-center gap-2">
           <AskBox />
-          <div className="flex gap-1 rounded-full bg-slate-900 p-1">
+          <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-slate-900 p-1">
           {METRICS.map((m) => (
             <button
               key={m.key}
@@ -190,7 +204,14 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
           </div>
         </div>
       </header>
+      {headline && (
+        <div className="border-b border-slate-800 bg-slate-900 px-5 py-1.5 text-sm text-slate-200">
+          {headline}
+        </div>
+      )}
       <div className="flex min-h-0 flex-1">
+        {view === "global" ? <GlobalView /> : (
+        <>
         <div className="relative min-w-0 flex-1">
           <div ref={mapRef} className="absolute inset-0 z-0" />
           <div className="absolute bottom-6 left-3 z-10 rounded-lg bg-white/95 p-3 text-xs text-slate-800 shadow">
@@ -253,6 +274,8 @@ export default function Dashboard({ metrics }: { metrics: BoroughMetrics[] }) {
             </div>
           )}
         </aside>
+        </>
+        )}
       </div>
     </div>
   );

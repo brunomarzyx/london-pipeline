@@ -10,3 +10,28 @@
 | data/raw/price-paid-london-2024-2025.csv | HM Land Registry Price Paid Data yearly files, London extract (County = GREATER LONDON; columns transfer_date, price, district, new_build) | https://www.gov.uk/government/statistical-data-sets/price-paid-data-yearly-file (source files https://price-paid-data.publicdata.landregistry.gov.uk/pp-2025.csv and https://price-paid-data.publicdata.landregistry.gov.uk/pp-2024.csv) | OGL v3 (full files 163–173 MB not kept; extract keeps London rows only, ~7 MB). Yearly files hold current (A) records with Date of Transfer in that calendar year; ingest keeps transfers dated 2024 (prior 12m) and 2025 (latest full 12m), all 33 boroughs. Street-level address columns dropped, so no Royal Mail/OS display conditions apply |
 
 Not used: GLA Planning London Datahub approvals (needs an access request); LDD archive (ends 2019).
+
+## Global capitals view (BIS; pulled 30 Oct 2026; build with `python3 scripts/build-global.py data/global.json`)
+
+| File | Source | URL | Covers |
+|---|---|---|---|
+| data/raw/bis-dpp-col.zip | BIS detailed residential property prices (topic RPP) | https://data.bis.org/static/bulk/WS_DPP_csv_col.zip | city series used (see below); reduced to `data/global.json` |
+| data/raw/bis-long-cpi-col.zip | BIS long consumer-price series (national CPI, monthly index level) | https://data.bis.org/static/bulk/WS_LONG_CPI_csv_col.zip | monthly CPI to 2026-09 (AU 2026-06, IL 2026-08) for deflation |
+| data/raw/bis-cbpol-flat.zip | BIS central bank policy rates (daily, month-end taken) | https://data.bis.org/static/bulk/WS_CBPOL_csv_flat.zip | month-end rates to 2026-10 for GB, XM, IL, CA, BR, AU, JP |
+
+City series used (all nominal; `lib/global.ts` deflates with national CPI into real indices):
+
+| City | BIS Series id | What it is | Latest |
+|---|---|---|---|
+| London | M:GB:2:1:0:1:0:0 | all dwellings, GBP per dwelling, monthly | 2026-08 |
+| Paris | Q:FR:2:8:1:1:0:0 | existing flats index, quarterly | 2026-Q2 |
+| Berlin | Q:DE:2:1:0:2:6:0 | all dwellings index, quarterly | 2026-Q2 |
+| Tel Aviv | M:IL:3:1:0:1:6:0 | all dwellings index, monthly | 2026-06 |
+| Toronto | Q:CA:3:0:0:2:6:0 | Greater Toronto index, quarterly | 2026-Q2 |
+| Sao Paulo | M:BR:2:1:0:2:6:0 | all dwellings index, monthly | 2026-08 |
+| Sydney | Q:AU:2:1:0:2:6:0 | all dwellings index, quarterly | 2026-Q2 |
+| Tokyo | M:JP:3:1:0:3:6:0 | all dwellings index, monthly | 2025-12 |
+
+Paris and Berlin use the euro-area (XM) policy rate. The 10-year peak for Tel Aviv uses available history only (series starts 2017).
+
+Checked but not included: Dubai (city series ends 2024-04 and BIS has no UAE policy rate); New York (BIS US city series `Q:US:3:2:1:3:6:0` does not name the metro, so it cannot be labelled); Singapore, Istanbul, Seoul, Mexico City (series found, cut to keep 8 cities with Europe/Middle East/North America/South America/Asia-Pacific spread).

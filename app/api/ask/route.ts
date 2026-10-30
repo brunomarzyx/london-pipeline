@@ -8,6 +8,6 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json({ error: "question must be 1–500 chars" }, { status: 400 });
-  const { answer, rounds } = await askQuestion(parsed.data.question);
-  return NextResponse.json({ answer, rounds });
+  const { answer, rounds, verification } = await askQuestion(parsed.data.question);
+  return NextResponse.json({ answer, rounds, verification });
 }

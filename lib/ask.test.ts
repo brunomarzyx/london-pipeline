@@ -13,6 +13,19 @@ describe("ask tools", () => {
     expect(res.metrics).toBeNull();
   });
 
+  it("returns global city metrics for London", () => {
+    const res = JSON.parse(runTool("get_city_metrics", { city: "London" }));
+    expect(res.city).toBe("London");
+    expect(typeof res.real1y).toBe("number");
+    expect(typeof res.policyRate).toBe("number");
+    expect(res.phase).toMatch(/expansion|cooling|correction|recovery|unknown/);
+  });
+
+  it("returns null with a note for an unknown city", () => {
+    const res = JSON.parse(runTool("get_city_metrics", { city: "Atlantis" }));
+    expect(res.metrics).toBeNull();
+  });
+
   it("rank top-1 matches the best row in the DB", () => {
     const all = getAllMetrics().filter((b) => b.netBuildup != null);
     const best = all.sort((a, b) => b.netBuildup! - a.netBuildup!)[0];

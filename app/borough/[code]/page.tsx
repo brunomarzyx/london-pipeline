@@ -13,6 +13,7 @@ import {
 import Charts from "./charts";
 import BriefCard from "./brief-card";
 import CycleCard from "./cycle-card";
+import MemoCard from "./memo-card";
 
 export const dynamic = "force-dynamic";
 
@@ -21,18 +22,18 @@ export default function BoroughPage({ params }: { params: { code: string } }) {
   if (!d) notFound();
   const phase = classifyCycle(d.priceChange, d.pressure, d.momentum);
   const cards = [
-    { label: "Latest price", value: fmtPrice(d.latestPrice) },
-    { label: "Price Δ 12m", value: fmtPct(d.priceChange) },
-    { label: "Net build-up (3 FY)", value: d.netBuildup == null ? "no data" : fmtHomes(d.netBuildup).replace(" homes", "") },
-    { label: "Supply pressure", value: fmtPressure(d.pressure) },
-    { label: "Starts momentum", value: fmtPct(d.momentum == null ? null : d.momentum * 100) },
-    { label: "Avg monthly rent", value: fmtPrice(d.avgRent) },
-    { label: "Rent Δ 12m", value: fmtPct(d.rentChange) },
-    { label: "Gross yield", value: fmtPct(d.grossYield) },
-    { label: "Price-to-rent", value: d.priceToRent == null ? "no data" : `${d.priceToRent.toFixed(1)}×` },
-    { label: "Sales (latest 12m)", value: d.latestSales == null ? "no data" : d.latestSales.toLocaleString("en-GB") },
-    { label: "Sales Δ 2025 vs 2024", value: fmtPct(d.salesChange == null ? null : d.salesChange * 100) },
-    { label: "New-build share", value: fmtPct(d.newBuildShare == null ? null : d.newBuildShare * 100) },
+    { key: "latestPrice", label: "Latest price", value: fmtPrice(d.latestPrice) },
+    { key: "priceChange", label: "Price Δ 12m", value: fmtPct(d.priceChange) },
+    { key: "netBuildup", label: "Net build-up (3 FY)", value: d.netBuildup == null ? "no data" : fmtHomes(d.netBuildup).replace(" homes", "") },
+    { key: "pressure", label: "Supply pressure", value: fmtPressure(d.pressure) },
+    { key: "momentum", label: "Starts momentum", value: fmtPct(d.momentum == null ? null : d.momentum * 100) },
+    { key: "avgRent", label: "Avg monthly rent", value: fmtPrice(d.avgRent) },
+    { key: "rentChange", label: "Rent Δ 12m", value: fmtPct(d.rentChange) },
+    { key: "grossYield", label: "Gross yield", value: fmtPct(d.grossYield) },
+    { key: "priceToRent", label: "Price-to-rent", value: d.priceToRent == null ? "no data" : `${d.priceToRent.toFixed(1)}×` },
+    { key: "latestSales", label: "Sales (latest 12m)", value: d.latestSales == null ? "no data" : d.latestSales.toLocaleString("en-GB") },
+    { key: "salesChange", label: "Sales Δ 2025 vs 2024", value: fmtPct(d.salesChange == null ? null : d.salesChange * 100) },
+    { key: "newBuildShare", label: "New-build share", value: fmtPct(d.newBuildShare == null ? null : d.newBuildShare * 100) },
   ];
   return (
     <main className="mx-auto max-w-5xl bg-slate-50 p-6 text-slate-900">
@@ -49,7 +50,7 @@ export default function BoroughPage({ params }: { params: { code: string } }) {
       <p className="text-sm text-slate-500">{d.code}</p>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
         {cards.map((c) => (
-          <div key={c.label} className="rounded-xl border bg-white p-3">
+          <div key={c.label} id={`metric-${c.key}`} className="rounded-xl border bg-white p-3">
             <div className="text-xs text-slate-500">{c.label}</div>
             <div className="mt-1 text-lg font-semibold tabular-nums">{c.value}</div>
           </div>
@@ -57,6 +58,7 @@ export default function BoroughPage({ params }: { params: { code: string } }) {
       </div>
       <BriefCard code={d.code} />
       <CycleCard code={d.code} />
+      <MemoCard code={d.code} />
       <div className="mt-6">
         <Charts detail={d} />
       </div>

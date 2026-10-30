@@ -3,6 +3,7 @@ import path from "node:path";
 import { z } from "zod";
 import { chat } from "./meta";
 import { getAllMetrics, getBoroughDetail } from "./db";
+import { getCityMetrics } from "./global-data";
 
 export const MAX_TOOL_ROUNDS = 4;
 
@@ -26,11 +27,17 @@ const RankArgs = z.object({
   n: z.number().int().min(1).max(33),
   order: z.enum(["desc", "asc"]),
 });
+const CityArgs = z.object({ city: z.string().min(1).max(40) });
 
 const ModelReply = z.union([
   z.object({
     type: z.literal("tool_call"),
-    name: z.enum(["list_boroughs", "get_borough_metrics", "rank_boroughs"]),
+    name: z.enum([
+      "list_boroughs",
+      "get_borough_metrics",
+      "rank_boroughs",
+      "get_city_metrics",
+    ]),
     args: z.unknown(),
   }),
   z.object({ type: z.literal("final"), answer: z.string().min(1).max(3000) }),
@@ -73,6 +80,28 @@ export function runTool(name: string, args: unknown): string {
       })
       .slice(0, n);
     return JSON.stringify(rows);
+  }
+  if (name === "get_city_metrics") {
+    const parsed = CityArgs.safeParse(args);
+    if (!parsed.success) return `error: invalid args (${parsed.error.message})`;
+    const m = getCityMetrics(parsed.data.city);
+    if (!m)
+      return JSON.stringify({
+        city: parsed.data.city,
+        metrics: null,
+        note: "unknown city (try London, Paris, Berlin, Tel Aviv, Toronto, Sao Paulo, Sydney, Tokyo)",
+      });
+    const r = (v: number | null) =>
+      v == null ? null : Math.round(v * 10000) / 10000;
+    return JSON.stringify({
+      ...m,
+      real1y: r(m.real1y),
+      real5y: r(m.real5y),
+      distFromPeak: r(m.distFromPeak),
+      policyRate: r(m.policyRate),
+      policyChange12m: r(m.policyChange12m),
+      spark: m.spark.map((o) => ({ p: o.p, v: Math.round(o.v * 100) / 100 })),
+    });
   }
   return `error: unknown tool "${name}"`;
 }
@@ -166,9 +195,26 @@ function mockFixtureFor(question: string, round: number): string {
   return round === 0 ? "ask-tool" : "ask-final";
 }
 
+export interface AskVerification {
+  total: number;
+  verified: number;
+}
+
+async function verifyAnswer(
+  answer: string,
+  history: { name: string; result: string }[],
+): Promise<AskVerification> {
+  const { verifyFigures } = await import("./memo");
+  const v = verifyFigures(
+    [answer],
+    history.map((h) => h.result),
+  );
+  return { total: v.total, verified: v.verified };
+}
+
 export async function askQuestion(
   question: string,
-): Promise<{ answer: string; rounds: number }> {
+): Promise<{ answer: string; rounds: number; verification: AskVerification }> {
   const system = await fs.readFile(
     path.join(process.cwd(), "prompts", "ask.md"),
     "utf8",
@@ -200,7 +246,12 @@ export async function askQuestion(
       });
       continue;
     }
-    if (parsed.data.type === "final") return { answer: parsed.data.answer, rounds: round + 1 };
+    if (parsed.data.type === "final")
+      return {
+        answer: parsed.data.answer,
+        rounds: round + 1,
+        verification: await verifyAnswer(parsed.data.answer, history),
+      };
     const result = runTool(parsed.data.name, parsed.data.args);
     history.push({ name: parsed.data.name, result });
   }
@@ -216,9 +267,15 @@ export async function askQuestion(
     extractJSON(reply.replace("{{summary}}", renderSummary(history))),
   );
   if (parsed.success && parsed.data.type === "final")
-    return { answer: parsed.data.answer, rounds: MAX_TOOL_ROUNDS + 1 };
+    return {
+      answer: parsed.data.answer,
+      rounds: MAX_TOOL_ROUNDS + 1,
+      verification: await verifyAnswer(parsed.data.answer, history),
+    };
+  const answer = `Based on the data: ${renderSummary(history)}. Approvals data is not in this build.`;
   return {
-    answer: `Based on the data: ${renderSummary(history)}. Approvals data is not in this build.`,
+    answer,
     rounds: MAX_TOOL_ROUNDS + 1,
+    verification: await verifyAnswer(answer, history),
   };
 }
