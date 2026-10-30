@@ -1,0 +1,23 @@
+import { NextResponse } from "next/server";
+import { getAreaComps } from "@/lib/street";
+
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const postcode = url.searchParams.get("postcode") ?? "";
+  const typeParam = url.searchParams.get("type");
+  const type =
+    typeParam === "flat" || typeParam === "house" ? typeParam : undefined;
+  const r = getAreaComps(postcode, type);
+  if ("error" in r) {
+    if (r.error === "invalid")
+      return NextResponse.json(
+        { error: "invalid postcode" },
+        { status: 400 },
+      );
+    return NextResponse.json(
+      { error: "postcode not found in London" },
+      { status: 404 },
+    );
+  }
+  return NextResponse.json(r);
+}

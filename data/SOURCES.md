@@ -11,6 +11,16 @@
 
 Not used: GLA Planning London Datahub approvals (needs an access request); LDD archive (ends 2019).
 
+## Street-level data (all OGL v3; pulled Oct 2026; built with `scripts/street/run_all.sh` → `data/street.db`)
+
+| File | Source | Covers |
+|---|---|---|
+| Price Paid yearly files (pp-2016.csv → pp-2026) | HM Land Registry Price Paid Data (OGL v3), https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads | Category A (standard market) sales only, types D/S/T/F, price in [£50k, £50m]; London rows kept in `data/street/ppd_london.parquet` |
+| ONS Postcode to OA/LSOA/MSOA lookup, May 2026 | ONS Geoportal postcode lookup | Every London postcode mapped to LSOA/MSOA/LAD + lat/lon (`data/street/pcd`, OS Code-Point Open coordinates) |
+| OS Code-Point Open | Ordnance Survey (via ONS lookup) | Postcode coordinates |
+
+Method: keep category A sales from the last 36 months (to 2026-09-30); drop log-price outliers beyond 3×IQR within MSOA × type; aggregate medians/p25/p75 at street → sector → LSOA → MSOA → borough → London; a level is reliable (`reliable=1`) only with n ≥ 10; repeat-sales BMN index per MSOA/borough/London (pairs ≥ 60), reported as 12-month-average vs prior-12-month change (`rs_chg_1y/5y`). Street code is `"<postal district>|<STREET>"` (e.g. `E14|MARSH WALL`).
+
 ## Global capitals view (BIS; pulled 30 Oct 2026; build with `python3 scripts/build-global.py data/global.json`)
 
 | File | Source | URL | Covers |

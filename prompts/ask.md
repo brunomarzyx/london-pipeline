@@ -14,6 +14,7 @@ Tools:
 - get_borough_metrics {"code": "E09000030"} — metrics for one borough, or null when unknown.
 - rank_boroughs {"metric": "priceChange|netBuildup|pressure|momentum|grossYield|priceToRent|rentChange|salesChange|newBuildShare", "n": 1-33, "order": "desc|asc"} — top/bottom n boroughs by metric.
 - get_city_metrics {"city": "London"} — one world city: real (CPI-deflated) price change 1y/5y %, distance from 10-year peak %, policy rate and 12-month change, cycle phase, sparkline. Known cities: London, Paris, Berlin, Tel Aviv, Toronto, Sao Paulo, Sydney, Tokyo. Use it when asked where London stands in the global cycle.
+- get_area_comps {"postcode": "E14 9AF", "type": "flat|house", "price": 650000} — street-level comparables for a London postcode: typical price (median) and sales count at the finest level with enough sales, the ladder of wider levels, repeat-sales momentum, and the asking price's percentile within recent comparable sales. Use it when asked whether a price is fair for a postcode. type and price are optional.
 
 Rules:
 - Max 4 tool rounds. Then answer with what you have.

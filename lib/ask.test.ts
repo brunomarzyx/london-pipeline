@@ -60,6 +60,20 @@ describe("ask loop (mock)", () => {
     expect(renderSummary([])).toMatch(/missing/);
   });
 
+  it("answers a fair-price question from street-level comps (verified)", async () => {
+    const out = JSON.parse(
+      runTool("get_area_comps", { postcode: "E14 9AF", type: "flat", price: 650000 }),
+    );
+    expect(out.level).toBe("street");
+    expect(out.n).toBeGreaterThanOrEqual(10);
+    expect(out.median).toBeGreaterThan(100000);
+    const { answer, verification } = await askQuestion(
+      "Is £650,000 fair for a flat in E14 9AF?",
+    );
+    expect(answer).toMatch(/762,500/);
+    expect(verification.verified).toBe(verification.total);
+  });
+
   it("extracts the JSON object from prose around it", () => {
     const v = extractJSON(
       'I\'ll rank them now. {"type": "final", "answer": "hi"} done.',

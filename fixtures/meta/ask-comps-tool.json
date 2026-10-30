@@ -1,0 +1,1 @@
+{"reply": "{\"type\": \"tool_call\", \"name\": \"get_area_comps\", \"args\": {\"postcode\": \"E14 9AF\", \"type\": \"flat\", \"price\": 650000}}"}

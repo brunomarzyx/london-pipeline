@@ -56,6 +56,7 @@ All calls go through one wrapper, `lib/meta.ts` (OpenAI SDK against `META_BASE_U
 - **Structured borough briefs:** each borough page generates a validated JSON card `{headline, supply_view, price_view, risk_flag, confidence}` from that borough's metrics only (`prompts/brief.md`, zod-validated, retry-once then graceful fallback).
 - **Verified analyst memo:** one or two boroughs in, one JSON memo out (`prompts/memo.md`, zod-validated). Every figure is checked against tool results and the card shows a "✓ n/m figures verified" badge; the qualitative market read-across must contain no numbers.
 - **Global view:** eight capitals/cities from BIS residential property prices, deflated with national CPI into real indices, against policy rates. A rule-based phase (expansion / cooling / correction / recovery) comes from real-price momentum × rate direction. Supply data isn't comparable across cities, so this view is prices and rates only.
+- **Street-level comps:** Ask London also has a `get_area_comps(postcode, type, price)` tool over `data/street.db` (Price Paid microdata aggregated to street→sector→LSOA→MSOA→borough). The `/area/[postcode]` page shows the verdict, ladder, repeat-sales momentum, recent sales and a map. Comps are NOT size-adjusted (no floor-area data; EPC floor areas are the next step).
 - **Cycle explanation:** a rule-based classifier maps 12-month price change × supply pressure to recovery / expansion / hypersupply / recession; Muse Spark explains the borough's phase in one paragraph (`prompts/cycle.md`), with a deterministic fallback when the model is unavailable.
 
 ## Data sources and limitations
@@ -67,6 +68,7 @@ Sources (OGL v3, pulled 30 Oct 2026; see [data/SOURCES.md](data/SOURCES.md)):
 - Boundaries: GLA statistical GIS boundaries (2011).
 - Rents: ONS Price Index of Private Rents, monthly to Sep 2026 (City of London suppressed → null). Gross yield = 12 × rent ÷ price; price-to-rent = price ÷ annual rent.
 - Sales: Land Registry Price Paid, calendar 2025 vs 2024 volumes and new-build share.
+- Street-level comps: `data/street.db`, built by `scripts/street/run_all.sh` (see [data/SOURCES.md](data/SOURCES.md) "Street-level data").
 - Global cities: BIS detailed residential property prices + long CPI + policy rates (pulled 30 Oct 2026; London, Paris, Berlin, Tel Aviv, Toronto, Sao Paulo, Sydney, Tokyo).
 
 Limitations:

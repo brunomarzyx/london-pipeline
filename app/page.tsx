@@ -2,6 +2,7 @@ import { getAllMetrics } from "@/lib/db";
 import { listCityMetrics } from "@/lib/global-data";
 import { fmtPct } from "@/lib/cycle-phase";
 import Dashboard from "./dashboard";
+import { getStreetDb } from "@/lib/street";
 
 export const dynamic = "force-dynamic";
 
@@ -17,5 +18,11 @@ export default function Home() {
         `${fmtPct(london.distFromPeak)} vs the 10-year peak` +
         (tokyo == null ? "." : ` — Tokyo ${fmtPct(tokyo.distFromPeak)} off peak.`) +
         " See the Global tab.";
-  return <Dashboard metrics={metrics} headline={headline} />;
+  return (
+    <Dashboard
+      metrics={metrics}
+      headline={headline}
+      streetOn={getStreetDb() != null}
+    />
+  );
 }

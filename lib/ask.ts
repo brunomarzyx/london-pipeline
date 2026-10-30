@@ -3,6 +3,7 @@ import path from "node:path";
 import { z } from "zod";
 import { chat } from "./meta";
 import { getAllMetrics, getBoroughDetail } from "./db";
+import { getAreaComps, pricePercentile } from "./street";
 import { getCityMetrics } from "./global-data";
 
 export const MAX_TOOL_ROUNDS = 4;
@@ -28,6 +29,11 @@ const RankArgs = z.object({
   order: z.enum(["desc", "asc"]),
 });
 const CityArgs = z.object({ city: z.string().min(1).max(40) });
+const CompsArgs = z.object({
+  postcode: z.string().min(1).max(10),
+  type: z.enum(["flat", "house"]).optional(),
+  price: z.number().int().positive().max(100_000_000).optional(),
+});
 
 const ModelReply = z.union([
   z.object({
@@ -37,6 +43,7 @@ const ModelReply = z.union([
       "get_borough_metrics",
       "rank_boroughs",
       "get_city_metrics",
+      "get_area_comps",
     ]),
     args: z.unknown(),
   }),
@@ -80,6 +87,32 @@ export function runTool(name: string, args: unknown): string {
       })
       .slice(0, n);
     return JSON.stringify(rows);
+  }
+  if (name === "get_area_comps") {
+    const parsed = CompsArgs.safeParse(args);
+    if (!parsed.success) return `error: invalid args (${parsed.error.message})`;
+    const r = getAreaComps(parsed.data.postcode, parsed.data.type ?? null);
+    if ("error" in r)
+      return JSON.stringify({ postcode: parsed.data.postcode, comps: null, note: r.error });
+    const prices = r.comps.map((c) => c.price);
+    const pct =
+      parsed.data.price != null ? pricePercentile(parsed.data.price, prices) : null;
+    return JSON.stringify({
+      postcode: r.postcode,
+      type: r.type,
+      level: r.chosenLevel,
+      name: r.chosenName,
+      n: r.chosenN,
+      median: r.chosenMedian,
+      p25: r.chosenP25,
+      p75: r.chosenP75,
+      momentum1y: r.momentum.chg1y,
+      momentum5y: r.momentum.chg5y,
+      momentumFrom: r.momentum.from,
+      askingPrice: parsed.data.price ?? null,
+      askingPercentile: pct,
+      asof: r.asof,
+    });
   }
   if (name === "get_city_metrics") {
     const parsed = CityArgs.safeParse(args);
@@ -192,6 +225,8 @@ export function renderSummary(history: { name: string; result: string }[]): stri
 function mockFixtureFor(question: string, round: number): string {
   if (/\[loop\]/.test(question)) return "ask-loop";
   if (/approv|permission|consent/i.test(question)) return "ask-approvals";
+  if (/fair|postcode|E ?\d/i.test(question))
+    return round === 0 ? "ask-comps-tool" : "ask-comps-final";
   return round === 0 ? "ask-tool" : "ask-final";
 }
 

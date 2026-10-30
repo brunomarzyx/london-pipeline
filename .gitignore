@@ -10,3 +10,4 @@ data/raw/boundaries/
 
 tsconfig.tsbuildinfo
 data/street/
+__pycache__/

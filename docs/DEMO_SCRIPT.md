@@ -38,3 +38,7 @@ Back on London, open Ask. Type: "Where is London in the global housing cycle com
 
 - "This is a tool-calling agent with four tools — the three borough tools plus get_city_metrics — and it must cite only returned numbers. If the data isn't there, it says so."
 - Read the answer. Close: "What's next: approvals data when GLA Datahub access lands, and a watch list above a pressure threshold you choose. Limitations: approvals aren't in this build, prices are averages not forecasts, and global series are nominal deflated with national CPI."
+
+After the borough memo: postcode search → E14 9AF verdict.
+
+- Type E14 9AF in the header postcode search (flat). "Typical flat price on Marsh Wall: £762,500 across 437 sales — and £650,000 sits above 83% of recent comps. Not size-adjusted: no floor-area data yet. The ladder shows why street level wins here, and momentum is the repeat-sales index — same homes resold, new builds excluded."

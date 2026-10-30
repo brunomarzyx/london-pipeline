@@ -48,7 +48,9 @@ function colorFor(v: number | null, breaks: number[]): string {
   return COLORS[Math.min(i, COLORS.length - 1)];
 }
 
-export default function Dashboard({ metrics, headline }: { metrics: BoroughMetrics[]; headline?: string }) {
+export default function Dashboard({ metrics, headline, streetOn }: { metrics: BoroughMetrics[]; headline?: string; streetOn?: boolean }) {
+  const [pc, setPc] = useState("");
+  const [pcType, setPcType] = useState("flat");
   const [metric, setMetric] = useState<LayerKey>("priceChange");
   const isPhase = metric === "phase";
   const [selected, setSelected] = useState<string | null>(null);
@@ -185,6 +187,39 @@ export default function Dashboard({ metrics, headline }: { metrics: BoroughMetri
         </div>
         <div className="ml-auto flex items-center gap-2">
           <AskBox />
+          {streetOn ? (
+            <form
+              className="flex items-center gap-1"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const slug = pc.trim().replace(/\s+/g, " ");
+                if (slug) window.location.href = `/area/${encodeURIComponent(slug)}?type=${pcType}`;
+              }}
+            >
+              <input
+                value={pc}
+                onChange={(e) => setPc(e.target.value)}
+                placeholder="Postcode e.g. E14 9AF"
+                aria-label="London postcode"
+                className="w-40 rounded-full bg-slate-900 px-3 py-1 text-sm uppercase text-slate-200 placeholder:normal-case placeholder:text-slate-500"
+              />
+              <select
+                value={pcType}
+                onChange={(e) => setPcType(e.target.value)}
+                aria-label="Property type"
+                className="rounded-full bg-slate-900 px-2 py-1 text-sm text-slate-300"
+              >
+                <option value="flat">flat</option>
+                <option value="house">house</option>
+              </select>
+              <button
+                type="submit"
+                className="rounded-full bg-sky-400 px-3 py-1 text-sm font-medium text-slate-950"
+              >
+                Comps
+              </button>
+            </form>
+          ) : null}
           <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-slate-900 p-1">
           {METRICS.map((m) => (
             <button

@@ -11,6 +11,7 @@ import {
   fmtPrice,
 } from "@/lib/cycle-phase";
 import Charts from "./charts";
+import StreetsMap from "./streets-map";
 import BriefCard from "./brief-card";
 import CycleCard from "./cycle-card";
 import MemoCard from "./memo-card";
@@ -61,6 +62,15 @@ export default function BoroughPage({ params }: { params: { code: string } }) {
       <MemoCard code={d.code} />
       <div className="mt-6">
         <Charts detail={d} />
+      </div>
+      <div className="mt-6 rounded-xl border bg-white p-4" id="streets">
+        <Link href="#streets" className="text-sm font-semibold text-sky-700 hover:underline">
+          Streets in this borough
+        </Link>
+        <p className="text-xs text-slate-500">
+          Reliable streets (n ≥ 10 sales in 36 months), circles coloured by median price.
+        </p>
+        <StreetsMap lad={d.code} />
       </div>
     </main>
   );
