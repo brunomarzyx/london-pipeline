@@ -25,4 +25,13 @@ describe("rankScreen", () => {
     ]);
     expect(out.map((r) => [r.lsoa, r.hits])).toEqual([["b2", 2], ["a1", 1]]);
   });
+  it("applies the optional transport and deprivation filters", () => {
+    const rows = [
+      row({ lsoa: "far", msoa: "A", ptai: 5, imdDecile: 6 }),
+      row({ lsoa: "poor", msoa: "B", ptai: 20, imdDecile: 1 }),
+      row({ lsoa: "good", msoa: "C", ptai: 20, imdDecile: 5 }),
+    ];
+    expect(rankScreen(rows, 10, { goodTransport: true, notDeprived: true }).map((r) => r.lsoa)).toEqual(["good"]);
+    expect(rankScreen(rows, 10).length).toBe(3);
+  });
 });

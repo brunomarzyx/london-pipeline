@@ -7,8 +7,9 @@ const gbp = (v: number) => `£${Math.round(v).toLocaleString("en-GB")}`;
 const pct = (v: number | null) =>
   v == null ? "—" : `${v >= 0 ? "+" : "−"}${Math.abs(v * 100).toFixed(1)}%`;
 
-export default function ScreenPage() {
-  const { rows, candidates, asof } = getValueScreen(30);
+export default function ScreenPage({ searchParams }: { searchParams: { transport?: string; deprived?: string } }) {
+  const opts = { goodTransport: searchParams.transport === "1", notDeprived: searchParams.deprived === "1" };
+  const { rows, candidates, asof } = getValueScreen(30, opts);
   return (
     <main className="mx-auto max-w-5xl bg-slate-50 p-6 text-slate-900">
       <Link href="/" className="text-sm text-sky-700 hover:underline">
@@ -21,6 +22,16 @@ export default function ScreenPage() {
         {rows.length} of {candidates} qualifying areas shown (one row per MSOA), to {asof ?? "—"}.
       </p>
 
+      <form method="get" className="mt-3 flex flex-wrap items-center gap-4 text-sm">
+        <label className="flex items-center gap-1">
+          <input type="checkbox" name="transport" value="1" defaultChecked={opts.goodTransport} /> Good transport (PTAL 3+)
+        </label>
+        <label className="flex items-center gap-1">
+          <input type="checkbox" name="deprived" value="1" defaultChecked={opts.notDeprived} /> Exclude most deprived 20%
+        </label>
+        <button className="rounded bg-sky-700 px-3 py-1 text-white">Apply</button>
+      </form>
+
       <div className="mt-4 overflow-x-auto rounded-xl border bg-white p-4">
         <table className="w-full text-sm">
           <thead>
@@ -32,6 +43,9 @@ export default function ScreenPage() {
               <th className="text-right">1y local</th>
               <th className="text-right">1y borough</th>
               <th className="text-right">5y local</th>
+              <th className="text-right">PTAL</th>
+              <th className="text-right">IMD</th>
+              <th className="text-right">Crime</th>
               <th className="text-right">n</th>
             </tr>
           </thead>
@@ -57,6 +71,9 @@ export default function ScreenPage() {
                 <td className="text-right tabular-nums">{pct(r.mom1y)}</td>
                 <td className="text-right tabular-nums text-slate-500">{pct(r.boroughMom1y)}</td>
                 <td className="text-right tabular-nums text-slate-500">{pct(r.mom5y)}</td>
+                <td className="text-right">{r.ptal ?? "—"}</td>
+                <td className="text-right tabular-nums">{r.imdDecile ?? "—"}</td>
+                <td className="text-right tabular-nums">{r.crimePctile != null ? `p${r.crimePctile}` : "—"}</td>
                 <td className="text-right tabular-nums text-slate-500">{r.n}</td>
               </tr>
             ))}
@@ -67,6 +84,8 @@ export default function ScreenPage() {
       <p className="mt-3 max-w-3xl text-xs text-slate-500">
         £/sq m: median of the last 36 months of Land Registry sales matched to EPC floor areas (n ≥ {SCREEN_MIN_N}).
         Momentum: repeat-sales index at MSOA level, only where it rests on ≥ {SCREEN_MIN_PAIRS} resale pairs.
+        PTAL: TfL transport access 0–6b (2015). IMD: deprivation decile, 1 = most deprived 10% in England (2025).
+        Crime: London percentile of recorded crime in the LSOA over the last 12 months (data.police.uk).
         A screen, not a recommendation: cheaper areas can be cheap for lasting reasons (stock quality, transport, flood risk).
       </p>
     </main>

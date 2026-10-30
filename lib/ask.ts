@@ -122,6 +122,11 @@ export function runTool(name: string, args: unknown): string {
       fairLow: r.ppsm?.fairRange?.low ?? null,
       fairMid: r.ppsm?.fairRange?.mid ?? null,
       fairHigh: r.ppsm?.fairRange?.high ?? null,
+      imdDecile: r.context?.imdDecile ?? null,
+      ptal: r.context?.ptal ?? null,
+      crime12m: r.context?.crime12m ?? null,
+      crimePctileLondon: r.context?.crimePctile ?? null,
+      crimeWindow: r.context?.crimeWindow ?? null,
       askingPpsm:
         parsed.data.price != null && parsed.data.sqm ? Math.round(parsed.data.price / parsed.data.sqm) : null,
       asof: r.asof,

@@ -139,6 +139,34 @@ export default function AreaPage({
         </p>
       </div>
 
+      {r.context && (
+        <div className="mt-4 rounded-xl border bg-white p-4">
+          <h2 className="text-sm font-semibold">Neighbourhood ({r.context.lsoa})</h2>
+          <div className="mt-2 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+            <div>
+              <div className="text-xs text-slate-500">Transport access (TfL PTAL)</div>
+              <div className="text-lg font-medium">{r.context.ptal ?? "no data"}</div>
+              <div className="text-xs text-slate-500">0 = worst, 6b = best · 2015{r.context.ptalImputed ? " · area average" : ""}</div>
+            </div>
+            <div>
+              <div className="text-xs text-slate-500">Deprivation (IMD 2025)</div>
+              <div className="text-lg font-medium">{r.context.imdDecile != null ? `Decile ${r.context.imdDecile}` : "no data"}</div>
+              <div className="text-xs text-slate-500">1 = most deprived 10% in England · rank {r.context.imdRank?.toLocaleString("en-GB") ?? "—"} of 33,755</div>
+            </div>
+            <div>
+              <div className="text-xs text-slate-500">Recorded crime, 12 months</div>
+              <div className="text-lg font-medium">{r.context.crime12m?.toLocaleString("en-GB") ?? "no data"}</div>
+              <div className="text-xs text-slate-500">
+                {r.context.crimePctile != null ? `${r.context.crimePctile}th percentile in London` : ""} · burglary {r.context.burglary12m ?? "—"} · violence {r.context.violence12m ?? "—"} · {r.context.crimeWindow ?? ""}
+              </div>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-slate-500">
+            Crime counts are recorded offences located in this LSOA (data.police.uk); busy centres rank high from footfall, not resident risk.
+          </p>
+        </div>
+      )}
+
       <div className="mt-4 rounded-xl border bg-white p-4">
         <h2 className="text-sm font-semibold">Ladder</h2>
         <table className="mt-2 w-full text-sm">

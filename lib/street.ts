@@ -38,6 +38,42 @@ export interface PpsmView {
   fairRange: { sqm: number; low: number; mid: number; high: number } | null;
 }
 
+/** Neighbourhood (LSOA) context: deprivation, transport access and recorded crime. */
+export interface AreaContext {
+  lsoa: string;
+  imdRank: number | null; // 1 = most deprived of 33,755 in England (IoD 2025)
+  imdDecile: number | null; // 1 = most deprived 10%
+  ptal: string | null; // TfL band 0-6b (2015)
+  ptai: number | null;
+  ptalImputed: boolean; // LSOA code changed 2011->2021: MSOA average used
+  crime12m: number | null;
+  burglary12m: number | null;
+  violence12m: number | null;
+  crimePctile: number | null; // within London LSOAs, 100 = most recorded crime
+  crimeWindow: string | null;
+}
+
+/** Null when the context table has not been built (feature hides itself). */
+export function getAreaContext(lsoa: string): AreaContext | null {
+  const d = getStreetDb();
+  if (!d) return null;
+  try {
+    const r = d.prepare("SELECT * FROM lsoa_context WHERE lsoa=?").get(lsoa) as
+      | { imd_rank: number | null; imd_decile: number | null; ptal: string | null; ptai: number | null; ptal_imputed: number;
+          crime_12m: number | null; burglary_12m: number | null; violence_12m: number | null; crime_pctile: number | null }
+      | undefined;
+    if (!r) return null;
+    const w = d.prepare("SELECT value FROM meta WHERE key='crime_window'").get() as { value: string } | undefined;
+    return {
+      lsoa, imdRank: r.imd_rank, imdDecile: r.imd_decile, ptal: r.ptal, ptai: r.ptai, ptalImputed: r.ptal_imputed === 1,
+      crime12m: r.crime_12m, burglary12m: r.burglary_12m, violence12m: r.violence_12m, crimePctile: r.crime_pctile,
+      crimeWindow: w?.value ?? null,
+    };
+  } catch {
+    return null; // table absent (e.g. older street.db or test fixture)
+  }
+}
+
 export interface AreaComps {
   postcode: string;
   type: CompType | null;
@@ -54,6 +90,7 @@ export interface AreaComps {
   asof: string;
   source: string;
   ppsm: PpsmView | null;
+  context: AreaContext | null;
 }
 
 let db: Database.Database | null = null;
@@ -302,6 +339,7 @@ export function getAreaComps(
     asof,
     source,
     ppsm,
+    context: getAreaContext(prow.lsoa),
   };
 }
 

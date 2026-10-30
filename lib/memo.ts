@@ -81,7 +81,11 @@ function toNumber(digits: string, sign: string): number {
  */
 export function extractFigures(text: string): Figure[] {
   const out: Figure[] = [];
-  const norm = text.replace(/[−–—]/g, "-").replace(/％/g, "%");
+  // ISO dates and year-months (2025-09, 2026-08-31) are periods, not figures to prove.
+  const norm = text
+    .replace(/\b(?:19|20)\d{2}-\d{2}(?:-\d{2})?\b/g, " ")
+    .replace(/[−–—]/g, "-")
+    .replace(/％/g, "%");
   FIGURE_RE.lastIndex = 0;
   let m: RegExpExecArray | null;
   while ((m = FIGURE_RE.exec(norm)) !== null) {

@@ -76,3 +76,10 @@ describe("memoToMarkdown", () => {
     expect(r.markdown).toMatch(/\[source: E09000007 \w+\]/);
   });
 });
+
+describe("extractFigures dates", () => {
+  it("ignores ISO year-months and dates, even before a comma", () => {
+    expect(extractFigures("182 crimes over 2025-09 to 2026-08, at the 60th percentile").map((f) => f.raw)).toEqual([]);
+    expect(extractFigures("as of 2026-09-30 the median was £535,000").map((f) => f.value)).toEqual([535000]);
+  });
+});
