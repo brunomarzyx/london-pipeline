@@ -12,3 +12,6 @@ tsconfig.tsbuildinfo
 data/street/
 __pycache__/
 data/context/
+
+# worktree symlinks
+/node_modules
