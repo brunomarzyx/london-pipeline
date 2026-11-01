@@ -1,0 +1,3 @@
+# keep small snapshots (TfL JSON); ignore any large downloads
+*.csv
+*.zip

@@ -1,0 +1,3 @@
+# OS download + extracted GML over 10 MB stay out of git
+*.zip
+/OS Open Greenspace (GML) TQ/
