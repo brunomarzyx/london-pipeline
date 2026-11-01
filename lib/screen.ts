@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { getStreetDb } from "./street";
 
 /** Value-vs-momentum screen: neighbourhoods (LSOAs) cheaper per sq m than their borough
@@ -15,6 +17,10 @@ export const NOT_DEPRIVED_MIN_DECILE = 3;
 export interface ScreenOpts {
   goodTransport?: boolean;
   notDeprived?: boolean;
+  /** Keep rows whose buyer-lens Area Risk Score is at most this (rows with no score are dropped). */
+  maxAreaScore?: number;
+  /** Drop rows whose representative postcode is in Flood Zone 3 (unknown zones are kept). */
+  excludeFloodZone3?: boolean;
 } // MSOA 1y momentum minus borough 1y momentum, must be > this
 
 export interface ScreenRow {
@@ -39,6 +45,10 @@ export interface ScreenRow {
   ptai?: number | null;
   imdDecile?: number | null;
   crimePctile?: number | null;
+  /** Buyer-lens Area Risk Score at the row's representative postcode (null when low coverage). */
+  areaScoreBuyer?: number | null;
+  /** True when the representative postcode is in Flood Zone 3 (null when unknown). */
+  floodZone3?: boolean | null;
 }
 
 /** Pure: keep rows that pass both tests, rank by momentum edge then depth of discount,
@@ -47,6 +57,8 @@ export function rankScreen(rows: ScreenRow[], limit = 25, opts: ScreenOpts = {})
   const passed = rows
     .filter((r) => !opts.goodTransport || (r.ptai ?? -1) >= GOOD_TRANSPORT_MIN_PTAI)
     .filter((r) => !opts.notDeprived || (r.imdDecile ?? 0) >= NOT_DEPRIVED_MIN_DECILE)
+    .filter((r) => opts.maxAreaScore == null || (r.areaScoreBuyer != null && r.areaScoreBuyer <= opts.maxAreaScore))
+    .filter((r) => !opts.excludeFloodZone3 || r.floodZone3 !== true)
     .filter((r) => r.n >= SCREEN_MIN_N && r.pairs >= SCREEN_MIN_PAIRS && r.discount <= MAX_DISCOUNT && r.edge > MIN_MOMENTUM_EDGE)
     .sort((a, b) => b.edge - a.edge || a.discount - b.discount);
   const byMsoa = new Map<string, ScreenRow>();
@@ -60,6 +72,26 @@ export function rankScreen(rows: ScreenRow[], limit = 25, opts: ScreenOpts = {})
 
 // Base rows are fixed for a given street.db, so compute once per server process.
 let cache: { rows: ScreenRow[]; asof: string | null } | null = null;
+
+// Precomputed LSOA Area Risk Scores (scripts/build-area-score-lsoa.ts). Joined by
+// LSOA in baseRows so the screen stays fast; live-scoring all rows costs ~3s.
+let scoreIndex: Record<string, { buyer: number | null; floodZone3: boolean | null }> | null = null;
+let scoreIndexMissing = false;
+
+function getScoreIndex(): Record<string, { buyer: number | null; floodZone3: boolean | null }> | null {
+  if (scoreIndex || scoreIndexMissing) return scoreIndex;
+  try {
+    const p = process.env.AREA_SCORE_LSOA_PATH ?? path.join(process.cwd(), "data", "context", "area-score-lsoa.json");
+    const raw = JSON.parse(fs.readFileSync(p, "utf8")) as {
+      rows: Record<string, { buyer: number | null; floodZone3: boolean | null }>;
+    };
+    scoreIndex = raw.rows;
+    return scoreIndex;
+  } catch {
+    scoreIndexMissing = true;
+    return null;
+  }
+}
 
 function baseRows(): { rows: ScreenRow[]; asof: string | null } | null {
   if (cache) return cache;
@@ -93,10 +125,13 @@ function baseRows(): { rows: ScreenRow[]; asof: string | null } | null {
          AND m.rs_chg_1y IS NOT NULL AND b.rs_chg_1y IS NOT NULL`,
     )
     .all() as Omit<ScreenRow, "discount" | "edge">[];
+  const idx = getScoreIndex();
   const rows = raw.map((r) => ({
     ...r,
     discount: r.ppsm / r.boroughPpsm - 1,
     edge: r.mom1y - r.boroughMom1y,
+    areaScoreBuyer: idx?.[r.lsoa]?.buyer ?? null,
+    floodZone3: idx?.[r.lsoa]?.floodZone3 ?? null,
   }));
   const asof = (d.prepare("SELECT value FROM meta WHERE key='asof'").get() as { value: string } | undefined)?.value ?? null;
   cache = { rows, asof };

@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { getAreaComps, getStreetDb, normalisePostcode } from "@/lib/street";
+import { getAreaScore } from "@/lib/area-score";
 import StreetUnavailable from "@/app/street-unavailable";
-import PriceCheck, { AreaMap } from "./widgets";
+import PriceCheck, { AreaMap, LensToggle } from "./widgets";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +32,7 @@ export default function AreaPage({
   searchParams,
 }: {
   params: { postcode: string };
-  searchParams: { type?: string; price?: string; sqm?: string };
+  searchParams: { type?: string; price?: string; sqm?: string; lens?: string };
 }) {
   const raw = decodeURIComponent(params.postcode);
   const pc = normalisePostcode(raw);
@@ -46,6 +48,16 @@ export default function AreaPage({
   const sqm = Number.isFinite(sqmParam) && sqmParam > 0 ? sqmParam : null;
   const r = getAreaComps(pc, type ?? undefined, sqm);
   if ("error" in r) notFound();
+  const lens = searchParams.lens === "investor" ? "investor" : "buyer";
+  const score = getAreaScore(pc, lens);
+  const bandColor =
+    score.band === "Low"
+      ? "text-emerald-700"
+      : score.band === "Moderate"
+        ? "text-amber-700"
+        : score.band === "Elevated"
+          ? "text-orange-700"
+          : "text-red-700";
   const typeLabel = r.type ?? "property";
   const priceParam = Number(searchParams.price);
   const initialPct =
@@ -77,6 +89,99 @@ export default function AreaPage({
       >
         Download memo
       </Link>
+
+      <div className="mt-4 rounded-xl border bg-white p-4">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <h2 className="text-sm font-semibold">Area Risk Score</h2>
+          <Suspense>
+            <LensToggle lens={lens} />
+          </Suspense>
+        </div>
+        {!score.located ? (
+          <p className="mt-2 text-sm text-slate-600">
+            Postcode not located: no coordinates in the lookup, so no area score.
+          </p>
+        ) : score.lowCoverage ? (
+          <p className="mt-2 text-sm text-slate-600">
+            Low coverage ({score.available}/{score.total} signals): not enough data for a score here.
+          </p>
+        ) : (
+          <>
+            <p className="mt-2 text-lg">
+              <span className="text-3xl font-semibold tabular-nums">{score.score}</span>{" "}
+              <span className={`font-medium ${bandColor}`}>{score.band}</span>{" "}
+              <span className="text-sm text-slate-500">
+                ({lens} lens · {score.available}/{score.total} signals)
+              </span>
+            </p>
+            {score.supplyPressure != null &&
+              (score.supplyPressure.percentile ?? 0) >= 90 && (
+                <p className="mt-2 rounded bg-amber-50 px-2 py-1 text-sm font-medium text-amber-800">
+                  {(score.supplyPressure.units ?? 0).toLocaleString("en-GB")} homes
+                  approved or under construction within 1 km — top{" "}
+                  {100 - Math.round(score.supplyPressure.percentile as number)}% in
+                  London.
+                  {score.supplyPressure.top.length > 0 && (
+                    <>
+                      {" "}Largest:{" "}
+                      {score.supplyPressure.top
+                        .map(
+                          (t) =>
+                            `${(t.units ?? 0).toLocaleString("en-GB")} units (${t.ref ?? "no ref"}, ${t.status ?? "?"})`,
+                        )
+                        .join("; ")}.
+                    </>
+                  )}
+                </p>
+              )}
+            <div className="mt-2 text-sm">
+              <p className="text-xs text-slate-500">Top drivers</p>
+              <ul className="list-disc pl-5">
+                {score.drivers.map((d) => (
+                  <li key={d.key}>
+                    {d.label} ({d.score}): {d.headline}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-1 text-xs text-slate-500">Strengths</p>
+              <ul className="list-disc pl-5">
+                {score.strengths.map((s) => (
+                  <li key={s.key}>
+                    {s.label} ({s.score}): {s.headline}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <details className="mt-2 text-sm">
+              <summary className="cursor-pointer text-sky-700 hover:underline">
+                All {score.components.length} components
+              </summary>
+              <ul className="mt-2 space-y-2">
+                {score.components.map((c) => (
+                  <li key={c.key} className="rounded border border-slate-100 p-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{c.label}</span>
+                      <span className="text-xs text-slate-500 tabular-nums">
+                        {c.available ? `${c.score}/100` : "no data"}
+                      </span>
+                    </div>
+                    <div className="mt-1 h-1.5 w-full rounded bg-slate-100">
+                      <div
+                        className="h-1.5 rounded bg-sky-600"
+                        style={{ width: `${c.available && c.score != null ? c.score : 0}%` }}
+                      />
+                    </div>
+                    <p className="mt-1 text-slate-600">{c.headline}</p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Source: {c.source} · as of {c.asof}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </>
+        )}
+      </div>
 
       <div className="mt-4 rounded-xl border bg-white p-4">
         <p className="text-lg">

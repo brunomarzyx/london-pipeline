@@ -1,6 +1,37 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { CompSale } from "@/lib/street";
+
+export function LensToggle({ lens }: { lens: "buyer" | "investor" }) {
+  const router = useRouter();
+  const params = useSearchParams();
+  const set = (l: "buyer" | "investor") => {
+    const q = new URLSearchParams(params.toString());
+    q.set("lens", l);
+    router.replace(`?${q.toString()}`, { scroll: false });
+  };
+  const btn = (l: "buyer" | "investor", label: string) => (
+    <button
+      onClick={() => set(l)}
+      aria-pressed={lens === l}
+      className={
+        lens === l
+          ? "rounded bg-sky-700 px-3 py-1 text-white"
+          : "rounded border px-3 py-1 text-sky-700"
+      }
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span className="text-slate-500">Lens:</span>
+      {btn("buyer", "Buyer")}
+      {btn("investor", "Investor")}
+    </div>
+  );
+}
 
 export default function PriceCheck({ prices }: { prices: number[] }) {
   const [raw, setRaw] = useState("");

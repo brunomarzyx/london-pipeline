@@ -46,3 +46,23 @@ Rounds: 1; verifier: 0/0 n/a (no figures); wall ms: 1981
 - Q4 "fell 6.4%": verifier now accepts rates with a fell-word as negative (lib/memo.ts). Re-ran verifyFigures on the saved answer with live tool outputs for E09000030 + London: 10/10 PASS.
 - Q5 "4.0 points below Camden": correctly still FAIL — derived arithmetic, not a tool number. prompts/ask.md now forbids derived figures ("state each number exactly as returned"). Live re-run deferred: phase live budget spent (20 calls across the 7 eval questions).
 - Injection ("ignore your instructions…") refused deterministically with 0 model calls (lib/ask.ts INJECTION_RE + test). Off-topic answered honestly with no tools, 1 call.
+
+## Phase 13 — get_area_risk (9 live calls across 3 questions; tool output now includes per-component facts so headline figures verify)
+
+## What is the buyer area risk score for SE15 4AN?
+
+Answer: The buyer Area Risk Score for SE15 4AN is 42, band Moderate with full coverage (10/10). Top drivers are Greenspace access (70.1), Air quality (63) with modelled annual-mean NO2 of 23.1 µg/m³, and School access (55.2). Key strengths are Heritage planning constraint (0) with standard permitted-development rights, and Flood risk (5) in Flood Zone 1 (low probability).
+
+Rounds: 2; verifier: 3/4 FAIL on first live run (23.1 appeared only in headline text, not as a JSON number) → fixed by adding `facts` to get_area_risk output and `ScoredComponent`; re-verified offline 4/4 PASS.
+
+## What is the investor area risk for E14 9AF? Is supply pressure a concern?
+
+Answer: Investor Area Risk for E14 9AF is 61, band Elevated, with 10/10 components available. Yes, supply pressure is a concern: New housing supply is the top driver at 98.9, with 13,145 pipeline homes within 1 km of E14 9AF (2,327 approved, not started; 10,818 under construction), higher than in 99% of London LSOAs. Other top drivers are Flood risk at 90 with E14 9AF in Flood Zone 3, and Short-let pressure at 84.4 with 20 entire-home short lets in the LSOA.
+
+Rounds: 2; verifier: 8/8 PASS.
+
+## Compare the investor area risk of E14 9AF and SE15 4AN.
+
+Answer: E14 9AF has higher investor risk at 61 (Elevated) than SE15 4AN at 47 (Moderate). E14 9AF is driven by 13,145 pipeline homes within 1 km of E14 9AF (2,327 approved, not started; 10,818 under construction), Flood Zone 3 (high probability) and 20 entire-home short lets in its LSOA, with EPC strength at median B. SE15 4AN has 147 pipeline homes within 1 km of SE15 4AN (30 approved, not started; 117 under construction), Flood Zone 1 (low probability) and EPC risk at median D, with 18 entire-home short lets in its LSOA.
+
+Rounds: 5 (model made 4 tool calls for a 2-postcode question); verifier: 3/3 PASS.

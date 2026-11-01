@@ -25,6 +25,26 @@ describe("rankScreen", () => {
     ]);
     expect(out.map((r) => [r.lsoa, r.hits])).toEqual([["b2", 2], ["a1", 1]]);
   });
+  it("applies max area score and flood-zone-3 filters", () => {
+    const rows = [
+      row({ lsoa: "safe-cheap", msoa: "A", areaScoreBuyer: 30, floodZone3: false }),
+      row({ lsoa: "risky", msoa: "B", areaScoreBuyer: 65, floodZone3: false }),
+      row({ lsoa: "wet", msoa: "C", areaScoreBuyer: 30, floodZone3: true }),
+      row({ lsoa: "unknown", msoa: "D", areaScoreBuyer: null, floodZone3: null }),
+    ];
+    expect(rankScreen(rows, 10, { maxAreaScore: 50 }).map((r) => r.lsoa)).toEqual([
+      "safe-cheap",
+      "wet",
+    ]);
+    expect(rankScreen(rows, 10, { excludeFloodZone3: true }).map((r) => r.lsoa)).toEqual([
+      "safe-cheap",
+      "risky",
+      "unknown",
+    ]);
+    expect(
+      rankScreen(rows, 10, { maxAreaScore: 50, excludeFloodZone3: true }).map((r) => r.lsoa),
+    ).toEqual(["safe-cheap"]);
+  });
   it("applies the optional transport and deprivation filters", () => {
     const rows = [
       row({ lsoa: "far", msoa: "A", ptai: 5, imdDecile: 6 }),

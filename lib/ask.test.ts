@@ -87,3 +87,64 @@ describe("ask loop (mock)", () => {
     expect(v.type).toBe("final");
   });
 });
+
+describe("get_area_risk tool", () => {
+  it("scores SE15 4AN on the buyer lens with full components", () => {
+    const out = JSON.parse(
+      runTool("get_area_risk", { postcode: "SE15 4AN", lens: "buyer" }),
+    );
+    expect(out.postcode).toBe("SE15 4AN");
+    expect(out.lens).toBe("buyer");
+    expect(out.located).toBe(true);
+    expect(out.score).toBe(42);
+    expect(out.band).toBe("Moderate");
+    expect(out.available).toBeGreaterThanOrEqual(5);
+    expect(out.lowCoverage).toBe(false);
+    expect(out.components.map((c: { key: string }) => c.key)).not.toContain(
+      "transport-premium",
+    );
+    expect(out.drivers.length).toBeLessThanOrEqual(3);
+    expect(out.strengths.length).toBeLessThanOrEqual(2);
+    // every component carries headline + source + as-of; score is the weighted mean
+    for (const c of out.components) {
+      expect(c.headline.length).toBeGreaterThan(0);
+      expect(c.source.length).toBeGreaterThan(0);
+      expect(c.asof.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("defaults to the buyer lens and validates the lens enum", () => {
+    const out = JSON.parse(runTool("get_area_risk", { postcode: "SE15 4AN" }));
+    expect(out.lens).toBe("buyer");
+    expect(out.score).toBe(42);
+    expect(runTool("get_area_risk", { postcode: "SE15 4AN", lens: "renter" })).toMatch(
+      /invalid args/,
+    );
+  });
+
+  it("uses investor weights (pipeline weighed heaviest)", () => {
+    const out = JSON.parse(
+      runTool("get_area_risk", { postcode: "E14 9AF", lens: "investor" }),
+    );
+    expect(out.score).toBe(61);
+    expect(out.band).toBe("Elevated");
+    expect(out.supplyUnits).toBe(13145);
+    expect(out.supplyPercentile).toBeCloseTo(98.9, 1);
+  });
+
+  it("returns null risk with a note for bad postcodes", () => {
+    expect(JSON.parse(runTool("get_area_risk", { postcode: "ZZZ" })).risk).toBeNull();
+    const unlocated = JSON.parse(runTool("get_area_risk", { postcode: "KT1 2TE" }));
+    if (!unlocated.located) expect(unlocated.note).toMatch(/not located/);
+  });
+
+  it("answers a risk question from tool output only (verified)", async () => {
+    const { answer, verification } = await askQuestion(
+      "What is the buyer area risk score for SE15 4AN?",
+    );
+    expect(answer).toMatch(/42/);
+    expect(answer).toMatch(/Moderate/);
+    expect(verification.verified).toBe(verification.total);
+    expect(verification.total).toBeGreaterThan(0);
+  });
+});

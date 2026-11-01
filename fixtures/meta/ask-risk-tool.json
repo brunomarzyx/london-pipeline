@@ -1,0 +1,1 @@
+{"reply": "{\"type\": \"tool_call\", \"name\": \"get_area_risk\", \"args\": {\"postcode\": \"SE15 4AN\", \"lens\": \"buyer\"}}"}

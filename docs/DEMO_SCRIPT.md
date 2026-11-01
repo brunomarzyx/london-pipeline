@@ -48,4 +48,11 @@ Open `/screen`.
 Open Ask. Type: "Is £650k fair for a 70 sq m flat at SE15 4AN?"
 
 - "The agent calls the postcode tool and answers with the size-adjusted fair range, where £650k sits against recent sales, and the neighbourhood context. The number verifier then checks each figure in the answer against the tool result. On the live run, 9 of 9 were verified."
-- Close: "Limits: the screen is a starting list, not a valuation; momentum is MSOA-level, not street-level; and prices are averages, not forecasts. Next: approvals data when GLA Datahub access lands."
+
+## 3:00–3:30 — Area Risk Score: investor lens vs buyer lens
+
+Open `/area/E14%209AF?lens=investor`, then `/area/SE15%204AN?lens=buyer`.
+
+- "One number per postcode: E14 9AF scores 61, Elevated, on the investor lens — the pipeline driver is 98.9 with 13,145 homes approved or under construction within a kilometre, top 1% in London, so the card shows a supply-pressure callout naming the largest schemes."
+- "Flip to SE15 4AN on the buyer lens: 42, Moderate — strengths are heritage at 0 and flood at 5, drivers schools, greenspace and air. Same engine, different question: what hurts an owner-occupier versus what hurts an investor."
+- Close: "Limits: the screen is a starting list, not a valuation; momentum is MSOA-level, not street-level; risk scores are within-London bands, not absolute risk; and prices are averages, not forecasts. Next: approvals data when GLA Datahub access lands."

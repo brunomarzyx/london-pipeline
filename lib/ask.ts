@@ -4,6 +4,7 @@ import { z } from "zod";
 import { chat } from "./meta";
 import { getAllMetrics, getBoroughDetail } from "./db";
 import { getAreaComps, pricePercentile } from "./street";
+import { getAreaScore } from "./area-score";
 import { getCityMetrics } from "./global-data";
 
 export const MAX_TOOL_ROUNDS = 4;
@@ -35,6 +36,10 @@ const CompsArgs = z.object({
   price: z.number().int().positive().max(100_000_000).optional(),
   sqm: z.number().positive().max(1000).optional(),
 });
+const RiskArgs = z.object({
+  postcode: z.string().min(1).max(10),
+  lens: z.enum(["buyer", "investor"]).optional(),
+});
 
 const ModelReply = z.union([
   z.object({
@@ -45,6 +50,7 @@ const ModelReply = z.union([
       "rank_boroughs",
       "get_city_metrics",
       "get_area_comps",
+      "get_area_risk",
     ]),
     args: z.unknown(),
   }),
@@ -130,6 +136,48 @@ export function runTool(name: string, args: unknown): string {
       askingPpsm:
         parsed.data.price != null && parsed.data.sqm ? Math.round(parsed.data.price / parsed.data.sqm) : null,
       asof: r.asof,
+    });
+  }
+  if (name === "get_area_risk") {
+    const parsed = RiskArgs.safeParse(args);
+    if (!parsed.success) return `error: invalid args (${parsed.error.message})`;
+    const r = getAreaScore(parsed.data.postcode, parsed.data.lens ?? "buyer");
+    if (!r.postcode)
+      return JSON.stringify({ postcode: parsed.data.postcode, risk: null, note: "invalid postcode" });
+    if (!r.located)
+      return JSON.stringify({ postcode: r.postcode, risk: null, note: "postcode not located" });
+    const slim = (c: {
+      key: string;
+      label: string;
+      score: number | null;
+      headline: string;
+      facts: Record<string, string | number | boolean | null>;
+      source: string;
+      asof: string;
+    }) => ({
+      key: c.key,
+      label: c.label,
+      score: c.score,
+      headline: c.headline,
+      facts: c.facts,
+      source: c.source,
+      asof: c.asof,
+    });
+    return JSON.stringify({
+      postcode: r.postcode,
+      lens: r.lens,
+      located: r.located,
+      score: r.score,
+      band: r.band,
+      lowCoverage: r.lowCoverage,
+      available: r.available,
+      total: r.total,
+      drivers: r.drivers.map(slim),
+      strengths: r.strengths.map(slim),
+      components: r.components.map(slim),
+      supplyUnits: r.supplyPressure?.units ?? null,
+      supplyPercentile: r.supplyPressure?.percentile ?? null,
+      supplyTop: r.supplyPressure?.top ?? [],
     });
   }
   if (name === "get_city_metrics") {
@@ -243,6 +291,8 @@ export function renderSummary(history: { name: string; result: string }[]): stri
 function mockFixtureFor(question: string, round: number): string {
   if (/\[loop\]/.test(question)) return "ask-loop";
   if (/approv|permission|consent/i.test(question)) return "ask-approvals";
+  if (/risk|area score/i.test(question))
+    return round === 0 ? "ask-risk-tool" : "ask-risk-final";
   if (/fair|postcode|E ?\d/i.test(question))
     return round === 0 ? "ask-comps-tool" : "ask-comps-final";
   return round === 0 ? "ask-tool" : "ask-final";

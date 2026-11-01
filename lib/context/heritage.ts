@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
-import { normalisePostcode } from "../street.js";
+import { normalisePostcode } from "../street";
 
 export type ContextSignal = {
   key: string;

@@ -52,7 +52,7 @@ flowchart LR
 
 All calls go through one wrapper, `lib/meta.ts` (OpenAI SDK against `META_BASE_URL`, model `muse-spark-1.3`), which logs prompt, completion and cached tokens per call to `logs/usage.jsonl` and supports `MOCK_META=1` fixtures so the UI and tests run without spending credits.
 
-- **Ask London (tool-calling analyst agent):** the model gets four tools — `list_boroughs()`, `get_borough_metrics(code)`, `rank_boroughs(metric, n, order)`, `get_city_metrics(city)` — over SQLite plus the BIS global snapshot. It calls tools, then answers in 2–3 sentences citing only returned numbers; if the data isn't there, it says so. Prompts: `prompts/ask.md`.
+- **Ask London (tool-calling analyst agent):** the model gets six tools — `list_boroughs()`, `get_borough_metrics(code)`, `rank_boroughs(metric, n, order)`, `get_city_metrics(city)`, `get_area_comps(postcode, …)`, `get_area_risk(postcode, lens)` — over SQLite plus the BIS global snapshot. It calls tools, then answers in 2–3 sentences citing only returned numbers; if the data isn't there, it says so. Prompts: `prompts/ask.md`.
 - **Structured borough briefs:** each borough page generates a validated JSON card `{headline, supply_view, price_view, risk_flag, confidence}` from that borough's metrics only (`prompts/brief.md`, zod-validated, retry-once then graceful fallback).
 - **Verified analyst memo:** one or two boroughs in, one JSON memo out (`prompts/memo.md`, zod-validated). Every figure is checked against tool results and the card shows a "✓ n/m figures verified" badge; the qualitative market read-across must contain no numbers.
 - **Global view:** eight capitals/cities from BIS residential property prices, deflated with national CPI into real indices, against policy rates. A rule-based phase (expansion / cooling / correction / recovery) comes from real-price momentum × rate direction. Supply data isn't comparable across cities, so this view is prices and rates only.
@@ -70,6 +70,27 @@ Borough averages hide a lot. The street-level layer answers "is this price fair 
 - **Ask London:** the postcode tool returns the fair range, percentile and neighbourhood context, and the number verifier checks every figure in the answer. Demo question: "Is £650k fair for a 70 sq m flat at SE15 4AN?" The recorded answer (`logs/usage.jsonl`) gives a size-adjusted fair range of £587,000 to £789,000 for Copleston Road, with £650,000 at the 58th percentile of recent flat sales. A live run verified 9/9 figures.
 
 Caveats: the screen is a starting list, not a valuation. Repeat-sales momentum is measured at MSOA level, not street level, and EPC matching covers 90.1% of sales, so the rest drop out of £ per sq m.
+
+## Area Risk Score
+
+Every area page (`/area/[postcode]`) shows one 0–100 score (0 best, 100 worst) built from 10 context signals, with a Buyer/Investor lens toggle (`?lens=`) and an API at `/api/area-score?postcode=&lens=`.
+
+| Signal | Source (licence) | As of |
+|---|---|---|
+| Flood risk | Environment Agency Flood Map for Planning via planning.data.gov.uk (OGL v3) | Aug 2023 |
+| Air quality | GLA/TfL London Atmospheric Emissions Inventory 2022 (London Datastore) | 2022 |
+| Noise | Defra strategic noise mapping Round 4, road + rail (OGL) | 2022 |
+| Schools | DfE GIAS + Ofsted (OGL) | Oct 2026 / Sep 2026 |
+| Transport proximity | TfL open data (Elizabeth line stops) + PTAL 2015 | Sep 2026 |
+| Greenspace | OS Open Greenspace (OS Open Data licence) | Nov 2026 |
+| Heritage | planning.data.gov.uk conservation/listed/article-4 (OGL v3) | Nov 2026 |
+| EPC / MEES risk | MHCLG domestic EPC register (OGL v3) | Dec 2026 |
+| Short lets | Inside Airbnb London listings (CC BY 4.0) | Sep 2026 |
+| Development pipeline | Planning London Datahub guest API (GLA) | Nov 2026 |
+
+Method: overall score is the weighted mean of available component scores, rounded; missing signals are dropped (reweighted). Buyer lens weighs flood 2 and schools 1.5 highest; investor lens weighs pipeline 2, short lets and EPC 1.5. Bands: Low <33, Moderate 33–55, Elevated 55–70, High >70. Under 5 of 10 signals there is no band ("low coverage"). Top drivers are the 3 largest weight×score contributions; top 2 strengths the lowest scores. When the pipeline signal is ≥90th percentile the card shows a supply-pressure callout with the largest schemes. `transport-premium` is excluded (sales data starts Oct 2023, no pre-2022 baseline); postcodes without coordinates show "postcode not located".
+
+Limits: scores are within-London percentiles/bands, not absolute risk; postcodes with different coverage are not strictly comparable. Flood zones are Aug 2023; PTAL underlies access at 2015. Ask London quotes the score only via the `get_area_risk` tool, and the number verifier checks every figure. The `/screen` Risk column and filters (max score, exclude Flood Zone 3) read a precomputed per-LSOA index (`data/context/area-score-lsoa.json`, rebuilt with `scripts/build-area-score-lsoa.ts`) because live-scoring all rows costs ~3s.
 
 ## Data sources and limitations
 

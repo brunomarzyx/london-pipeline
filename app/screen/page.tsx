@@ -9,9 +9,15 @@ const gbp = (v: number) => `£${Math.round(v).toLocaleString("en-GB")}`;
 const pct = (v: number | null) =>
   v == null ? "—" : `${v >= 0 ? "+" : "−"}${Math.abs(v * 100).toFixed(1)}%`;
 
-export default function ScreenPage({ searchParams }: { searchParams: { transport?: string; deprived?: string } }) {
+export default function ScreenPage({ searchParams }: { searchParams: { transport?: string; deprived?: string; maxScore?: string; noflood?: string } }) {
   if (!getStreetDb()) return <StreetUnavailable />;
-  const opts = { goodTransport: searchParams.transport === "1", notDeprived: searchParams.deprived === "1" };
+  const maxScore = Number(searchParams.maxScore);
+  const opts = {
+    goodTransport: searchParams.transport === "1",
+    notDeprived: searchParams.deprived === "1",
+    maxAreaScore: Number.isFinite(maxScore) && maxScore > 0 ? maxScore : undefined,
+    excludeFloodZone3: searchParams.noflood === "1",
+  };
   const { rows, candidates, asof } = getValueScreen(30, opts);
   return (
     <main className="mx-auto max-w-5xl bg-slate-50 p-6 text-slate-900">
@@ -32,6 +38,13 @@ export default function ScreenPage({ searchParams }: { searchParams: { transport
         <label className="flex items-center gap-1">
           <input type="checkbox" name="deprived" value="1" defaultChecked={opts.notDeprived} /> Exclude most deprived 20%
         </label>
+        <label className="flex items-center gap-1">
+          Max area score (buyer)
+          <input type="number" name="maxScore" min={0} max={100} defaultValue={opts.maxAreaScore ?? ""} className="w-20 rounded border px-1 py-0.5" />
+        </label>
+        <label className="flex items-center gap-1">
+          <input type="checkbox" name="noflood" value="1" defaultChecked={opts.excludeFloodZone3} /> Exclude Flood Zone 3
+        </label>
         <button className="rounded bg-sky-700 px-3 py-1 text-white">Apply</button>
       </form>
 
@@ -48,6 +61,7 @@ export default function ScreenPage({ searchParams }: { searchParams: { transport
               <th className="text-right">5y local</th>
               <th className="text-right">PTAL</th>
               <th className="text-right">IMD</th>
+              <th className="text-right">Risk</th>
               <th className="text-right">Crime</th>
               <th className="text-right">n</th>
             </tr>
@@ -76,6 +90,9 @@ export default function ScreenPage({ searchParams }: { searchParams: { transport
                 <td className="text-right tabular-nums text-slate-500">{pct(r.mom5y)}</td>
                 <td className="text-right">{r.ptal ?? "—"}</td>
                 <td className="text-right tabular-nums">{r.imdDecile ?? "—"}</td>
+                <td className="text-right tabular-nums" title={r.floodZone3 ? "Representative postcode in Flood Zone 3" : undefined}>
+                  {r.areaScoreBuyer ?? "—"}{r.floodZone3 ? " ⚠" : ""}
+                </td>
                 <td className="text-right tabular-nums">{r.crimePctile != null ? `p${r.crimePctile}` : "—"}</td>
                 <td className="text-right tabular-nums text-slate-500">{r.n}</td>
               </tr>
@@ -89,6 +106,7 @@ export default function ScreenPage({ searchParams }: { searchParams: { transport
         Momentum: repeat-sales index at MSOA level, only where it rests on ≥ {SCREEN_MIN_PAIRS} resale pairs.
         PTAL: TfL transport access 0–6b (2015). IMD: deprivation decile, 1 = most deprived 10% in England (2025).
         Crime: London percentile of recorded crime in the LSOA over the last 12 months (data.police.uk).
+        Risk: buyer-lens Area Risk Score (0 best … 100 worst) at the row's busiest postcode; ⚠ marks Flood Zone 3. Scores are precomputed per LSOA (data/context/area-score-lsoa.json, scripts/build-area-score-lsoa.ts); rows with no score are dropped when a max score is set.
         A screen, not a recommendation: cheaper areas can be cheap for lasting reasons (stock quality, transport, flood risk).
       </p>
     </main>
