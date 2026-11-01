@@ -76,3 +76,35 @@ Live loop trace (10 model calls): extract_listing → {price 650000, sqm 70, pos
 Fix: slim tool outputs in the model transcript (1500 chars each, full text kept for the verifier) and raise diligence calls to maxTokens 8192. Final verdict then completed in 1 further live call: verdict "looks fair" — asking 650000 within 587000–789000, below midpoint 690000; risks crime 182 (percentile 60), area risk 42 Moderate, borough price 569160 change -2.1233; strengths PTAL 5 (PTAI 23.3), 9286/sq m below street median 9863. Verifier: 11/11 PASS. Total 14 live calls this phase (13 chat + 1 probe); 1 spare kept.
 
 Voice probe: GET /models lists muse-voice-transcribe-1.0, so /api/transcribe (multipart audio → text) plus a mic button on Ask London and the diligence page were added. Mock transcribe handler: 200 with fixture text; 400 on non-multipart. Live transcription not exercised (no budget left).
+
+
+## Due-diligence agent — live end-to-end via /api/diligence (1 Nov, real server)
+
+Test fixture listing: 2-bed flat, SE15 4AN, £650,000, 70 sq m. Before fix: 58 s, 8 rounds, valid verdicts rejected by over-strict array lengths in VerdictSchema -> 'not enough data'. After fix: 21 s, 5 rounds, verifier 6/6.
+
+```json
+{
+  "verdict": "looks fair",
+  "headline": "Two-bedroom flat on Copleston Road looks fairly priced for its size and street.",
+  "price_check": "Asking price £650,000 for 70 sq m sits inside the size-adjusted fair range of £587,000 to £789,000 and below the mid-point of £690,000, around the 58th percentile of recent flat sales.",
+  "risks": [
+    "Southwark prices are down 2.1% in the year, pointing to a softer resale backdrop.",
+    "Wider area momentum is down 8.0% on the year, so recent price direction has been weak.",
+    "Second floor share of freehold at 70 sq m needs confirmation of lease length, service charges and access arrangements."
+  ],
+  "strengths": [
+    "Nearest park access 371 m away with plenty of usable green space nearby for day-to-day living.",
+    "Four good primary schools nearby, with the nearest 540 m away."
+  ],
+  "questions_to_ask_agent": [
+    "What is the lease length, service charge, ground rent and any planned major works?",
+    "How was the 70 sq m measured and can you share the full floorplan, orientation and storage?",
+    "Any history of damp, restrictions or disputes affecting the share of freehold?"
+  ],
+  "sources": [
+    "Street-level comparables and fair range",
+    "Buyer area risk assessment",
+    "Southwark borough context"
+  ]
+}
+```

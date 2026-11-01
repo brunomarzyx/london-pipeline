@@ -12,10 +12,10 @@ export const VerdictSchema = z.object({
   verdict: z.enum(["looks fair", "looks expensive", "looks cheap", "not enough data"]),
   headline: z.string().min(1).max(500),
   price_check: z.string().min(1).max(800),
-  risks: z.array(z.string().min(1).max(300)).length(3),
-  strengths: z.array(z.string().min(1).max(300)).length(2),
-  questions_to_ask_agent: z.array(z.string().min(1).max(300)).length(3),
-  sources: z.array(z.string().min(1).max(200)).min(1).max(4),
+  risks: z.array(z.string().min(1).max(400)).min(1).max(6).transform((a) => a.slice(0, 3)),
+  strengths: z.array(z.string().min(1).max(400)).min(1).max(6).transform((a) => a.slice(0, 2)),
+  questions_to_ask_agent: z.array(z.string().min(1).max(400)).min(1).max(6).transform((a) => a.slice(0, 3)),
+  sources: z.array(z.string().min(1).max(300)).min(1).max(8).transform((a) => a.slice(0, 5)),
 });
 export type DiligenceVerdict = z.infer<typeof VerdictSchema>;
 
