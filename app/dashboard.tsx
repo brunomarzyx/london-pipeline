@@ -175,6 +175,7 @@ export default function Dashboard({ metrics, headline, streetOn }: { metrics: Bo
         <h1 className="text-lg font-semibold tracking-tight">London Pipeline</h1>
         <span className="text-sm text-slate-400">supply vs price by borough</span>
         <Link href="/screen" className="rounded-full border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:border-slate-400">Value screen →</Link>
+        <Link href="/check" className="rounded-full border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:border-slate-400">Check a listing →</Link>
         <div className="flex gap-1 rounded-full bg-slate-900 p-1">
           {(["london", "global"] as const).map((v) => (
             <button
