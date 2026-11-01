@@ -12,6 +12,8 @@ export interface ChatOptions {
   maxTokens?: number;
   fixture?: string;
   effort?: "low" | "medium" | "high";
+  /** Optional image data URLs (data:image/...;base64,...) sent with the user message. */
+  images?: string[];
 }
 
 export interface UsageRecord {
@@ -73,7 +75,18 @@ export async function chat(
         : {}),
       messages: [
         ...(opts.system ? [{ role: "system" as const, content: opts.system }] : []),
-        { role: "user" as const, content: userMessage },
+        {
+          role: "user" as const,
+          content: opts.images?.length
+            ? [
+                { type: "text" as const, text: userMessage },
+                ...opts.images.map((url) => ({
+                  type: "image_url" as const,
+                  image_url: { url },
+                })),
+              ]
+            : userMessage,
+        },
       ],
     });
     reply = res.choices[0]?.message?.content ?? "";
