@@ -1,0 +1,24 @@
+{
+  "id": "check-se15",
+  "kind": "check",
+  "input": {
+    "text": "2 bed flat on Copleston Road, London SE15 4AN. £650,000. 70 sq m internal area."
+  },
+  "savedAt": "2026-11-01T15:26:16.476Z",
+  "mock": false,
+  "result": {
+    "fields": {
+      "price": 650000,
+      "sqm": 70,
+      "postcode": "SE15 4AN",
+      "type": "flat",
+      "bedrooms": 2
+    },
+    "areaAsPrinted": {
+      "value": 70,
+      "unit": "sqm"
+    },
+    "warnings": [],
+    "failed": false
+  }
+}

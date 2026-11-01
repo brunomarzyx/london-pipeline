@@ -1,0 +1,75 @@
+{
+  "id": "diligence-se15-investor",
+  "kind": "diligence",
+  "input": {
+    "text": "2 bed flat on Copleston Road, London SE15 4AN. £650,000. 70 sq m internal area.",
+    "postcode": null,
+    "price": null,
+    "goal": "investor"
+  },
+  "savedAt": "2026-11-01T15:26:15.270Z",
+  "mock": false,
+  "result": {
+    "verdict": {
+      "verdict": "looks fair",
+      "headline": "Two-bed flat on Copleston Road looks fairly priced for an investor, with some letting risks to check.",
+      "price_check": "At £650,000 for 70 sq m, the flat sits inside the size-adjusted fair range of £587,000 to £789,000, below the midpoint of £690,000.",
+      "risks": [
+        "Holiday-let competition is high with 18 entire-home lets nearby, which can affect demand from long-term tenants.",
+        "Energy efficiency is a concern with most of 197 nearby homes rated D or below, so check this flat's rating and letting rules.",
+        "There are 147 pipeline homes within 1 km, which could add competition for tenants if completed."
+      ],
+      "strengths": [
+        "The asking price per sq m of £9,286 sits below the street median of £9,863.",
+        "Southwark investor backdrop shows average rent of £2,516 and a yield of 5.3%."
+      ],
+      "questions_to_ask_agent": [
+        "What is the current energy rating and has any retrofit work been done?",
+        "What is the tenure, lease length, service charge and ground rent?",
+        "Is there any history of short lets or licensing issues in the block?"
+      ],
+      "sources": [
+        "Street comparables for Copleston Road",
+        "Southwark borough sales and rental data",
+        "Investor area risk including short-let and energy efficiency data"
+      ]
+    },
+    "steps": [
+      {
+        "name": "get_area_comps",
+        "args": {
+          "postcode": "SE15 4AN",
+          "price": 650000,
+          "sqm": 70,
+          "type": "flat"
+        },
+        "result": "{\"postcode\":\"SE15 4AN\",\"type\":\"flat\",\"level\":\"street\",\"name\":\"Copleston Road, SE15\",\"n\":18,\"median\":598215,\"p25\":511250,\"p75\":716060,\"momentum1y\":-0.08030672100887515,\"momentum5y\":0.05130109790369253,\"momentumFrom\":\"MSOA\",\"askingPrice\":650000,\"askingPercentile\":58,\"ppsmLevel\":\"street\",\"ppsmName\":\"Copleston Road, SE15\",\"ppsmN\":17,\"ppsmMedian\":9863,\"ppsmP25\":8392,\"ppsmP75\":11267,\"floorArea\":70,\"fairLow\":587000,\"fairMid\":690000,\"fairHigh\":789000,\"imdDecile\":5,\"ptal\":\"5\",\"crime12m\":182,\"crimePctileLondon\":60,\"crimeWindow\":\"2025-09 to 2026-08\",\"askingPpsm\":9286,\"asof\":\"2026-09-30\"}",
+        "ms": 2
+      },
+      {
+        "name": "get_area_risk",
+        "args": {
+          "postcode": "SE15 4AN",
+          "lens": "investor"
+        },
+        "result": "{\"postcode\":\"SE15 4AN\",\"lens\":\"investor\",\"located\":true,\"score\":47,\"band\":\"Moderate\",\"lowCoverage\":false,\"available\":10,\"total\":10,\"drivers\":[{\"key\":\"shortlets\",\"label\":\"Short-let pressure\",\"score\":81.4,\"headline\":\"18 entire-home short lets in the LSOA containing SE15 4AN (28% available >90 nights/year); short-let pressure is higher than in 81% of London LSOAs.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"lsoa\":\"E01004061\",\"n_entire_home\":18,\"n_avail_gt90\":5,\"pct_entire_home_london\":81.4,\"rule_nights\":90},\"source\":\"Inside Airbnb London listings (CC BY 4.0); LSOA 2021 by nearest postcode centroid\",\"asof\":\"2026-09-17\"},{\"key\":\"epc\",\"label\":\"EPC & retrofit risk\",\"score\":65.7,\"headline\":\"70% of 197 EPC-rated homes at street level near SE15 4AN are rated D or below (median D); 14% are E or below and 2% F/G, which cannot be let under the current EPC-E minimum.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"level\":\"street\",\"n\":197,\"share_dg\":0.7005,\"share_eg\":0.1421,\"share_fg\":0.0203,\"median_rating\":\"D\",\"pct_dg_london\":65.7,\"mees_min_in_force\":\"E\",\"mees_proposed\":\"C by 2030 (announced, not in force)\"},\"source\":\"MHCLG domestic EPC full load via main-repo extract (OGL); latest cert per home\",\"asof\":\"2026-12-31\"},{\"key\":\"pipeline\",\"label\":\"New housing supply\",\"score\":40.6,\"headline\":\"147 pipeline homes within 1 km of SE15 4AN (30 approved, not started; 117 under construction), higher than in 41% of London LSOAs. Largest: 29 units (16/AP/1896, under construction); 27 units (16/AP/2051, under construction); 10 units (24/AP/2501, approved, not started).\",\"facts\":{\"postcode\":\"SE15 4AN\",\"lsoa\":\"E01004061\",\"units_not_started_1km\":30,\"units_under_construction_1km\":117,\"units_pipeline_1km\":147,\"pct_pipeline_london\":40.6,\"top1_ref\":\"16/AP/1896\",\"top1_units\":29,\"top1_status\":\"under construction\",\"top2_ref\":\"16/AP/2051\",\"top2_units\":27,\"top2_status\":\"under construction\",\"top3_ref\":\"24/AP/2501\",\"top3_units\":10,\"top3_status\":\"approved, not started\"},\"source\":\"Planning London Datahub guest API (planningdata.london.gov.uk), Approved decisions 2015-01-01..2026-09-30 with >=1 proposed residential unit\",\"asof\":\"2026-11-01\"}],\"strengths\":[{\"key\":\"heritage\",\"label\":\"Heritage planning constraint\",\"score\":0,\"headline\":\"No conservation area, nearby listed building or Article 4 direction recorded here — standard permitted-development rights apply.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"in_conservation_area\":false,\"conservation_area_name\":null,\"listed_buildings_within_100m\":0,\"nearest_listed_m\":null,\"nearest_listed_name\":null,\"nearest_listed_grade\":null,\"in_article_4_area\":false,\"article_4_ref\":null},\"source\":\"planning.data.gov.uk datasets conservation-area, listed-building and article-4-direction-area https://files.planning.data.gov.uk/dataset/conservation-area.csv, https://files.planning.data.gov.uk/dataset/listed-building.csv, https://files.planning.data.gov.uk/dataset/article-4-direction-area.csv\",\"asof\":\"2026-11-01\"},{\"key\":\"flood\",\"label\":\"Flood risk\",\"score\":5,\"headline\":\"SE15 4AN is in Flood Zone 1 (low probability).\",\"facts\":{\"postcode\":\"SE15 4AN\",\"floodZone\":1},\"source\":\"Environment Agency Flood Map for Planning (Rivers and Sea) via planning.data.gov.uk dataset flood-risk-zone — https://planning.data.gov.uk/dataset/flood-risk-zone\",\"asof\":\"2023-08-24\"}],\"components\":[{\"key\":\"flood\",\"label\":\"Flood risk\",\"score\":5,\"headline\":\"SE15 4AN is in Flood Zone 1 (low probability).\",\"facts\":{\"postcode\":\"SE15 4AN\",\"floodZone\":1},\"source\":\"Environment Agency Flood Map for Planning (Rivers and Sea) via planning.data.gov.uk dataset flood-risk-zone — https://planning.data.gov.uk/dataset/flood-risk-zone\",\"asof\":\"2023-08-24\"},{\"key\":\"air\",\"label\":\"Air quality\",\"score\":63,\"headline\":\"SE15 4AN has modelled annual-mean NO2 of 23.1 µg/m³ (dirtier than 63% of London postcodes; WHO 2021 guideline is 10 µg/m³).\",\"facts\":{\"postcode\":\"SE15 4AN\",\"no2\":23.1,\"pm25\":9.6,\"no2Percentile\":63,\"whoNo2Guideline\":10,\"whoPm25Guideline\":5,\"exceedsWhoNo2\":true,\"exceedsWhoPm25\":true},\"source\":\"GLA/TfL London Atmospheric Emissions Inventory (LAEI) 2022 modelled annual-mean concentrations — https://data.london.gov.uk/dataset/london-atmospheric-emissions-inventory--laei--2022\",\"asof\":\"2022\"},{\"key\":\"noise\",\"label\":\"Noise\",\"score\":15,\"headline\":\"SE15 4AN is in the low noise band (road Lden 53.8 dB, rail Lden 47.8 dB; bands: <55 low, 55–65 medium, 65–70 high, >70 very high).\",\"facts\":{\"postcode\":\"SE15 4AN\",\"roadLden\":53.8,\"railLden\":47.8,\"band\":\"low\"},\"source\":\"Defra strategic noise mapping Round 4 (2022) Lden, road and rail — https://environment.data.gov.uk/spatialdata/noise-data/wms\",\"asof\":\"2022\"},{\"key\":\"schools\",\"label\":\"School access\",\"score\":55.2,\"headline\":\"Nearest good/outstanding primary is Goose Green Primary and Nursery School (540 m away); nearest good/outstanding secondary is Harris Boys' Academy East Dulwich (1.3 km away); 4 good/outstanding schools within 1 km.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"nearest_good_primary_m\":540,\"nearest_good_primary_name\":\"Goose Green Primary and Nursery School\",\"nearest_good_primary_rating\":2,\"nearest_good_primary_inspection_date\":\"15/01/2020\",\"nearest_good_secondary_m\":1321,\"nearest_good_secondary_name\":\"Harris Boys' Academy East Dulwich\",\"nearest_good_secondary_rating\":1,\"nearest_good_secondary_inspection_date\":\"28/11/2023\",\"good_primaries_within_1km\":4,\"good_secondaries_within_1km\":0},\"source\":\"DfE Get Information About Schools (GIAS) all-establishments extract https://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/ Ofsted state-funded schools inspections and outcomes management information https://www.gov.uk/government/statistical-data-sets/monthly-management-information-ofsteds-school-inspections-outcomes\",\"asof\":\"2026-10-31\"},{\"key\":\"transport-proximity\",\"label\":\"Elizabeth line proximity\",\"score\":62.9,\"headline\":\"Nearest Elizabeth line station is Liverpool Street (5.7 km away; Elizabeth line service since 2022-05-24).\",\"facts\":{\"postcode\":\"SE15 4AN\",\"nearest_station\":\"Liverpool Street\",\"nearest_station_m\":5730,\"elizabeth_service_since\":\"2022-05-24\"},\"source\":\"TfL open data Line/elizabeth StopPoints https://api.tfl.gov.uk/Line/elizabeth/StopPoints + HM Land Registry Price Paid sales in data/street.db (indexed postcode/sector queries, see lib/street.ts)\",\"asof\":\"2026-09-30\"},{\"key\":\"greenspace\",\"label\":\"Greenspace access\",\"score\":70.1,\"headline\":\"Nearest public park, garden or playing-field access point is 371 m away; 14.1 ha of public green space within 800 m.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"nearest_access_point_m\":371,\"green_area_within_800m_m2\":141194,\"green_area_within_800m_ha\":14.1},\"source\":\"OS Open Greenspace https://api.os.uk/downloads/v1/products/OpenGreenspace/downloads (TQ square, GML)\",\"asof\":\"2026-11-01\"},{\"key\":\"heritage\",\"label\":\"Heritage planning constraint\",\"score\":0,\"headline\":\"No conservation area, nearby listed building or Article 4 direction recorded here — standard permitted-development rights apply.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"in_conservation_area\":false,\"conservation_area_name\":null,\"listed_buildings_within_100m\":0,\"nearest_listed_m\":null,\"nearest_listed_name\":null,\"nearest_listed_grade\":null,\"in_article_4_area\":false,\"article_4_ref\":null},\"source\":\"planning.data.gov.uk datasets conservation-area, listed-building and article-4-direction-area https://files.planning.data.gov.uk/dataset/conservation-area.csv, https://files.planning.data.gov.uk/dataset/listed-building.csv, https://files.planning.data.gov.uk/dataset/article-4-direction-area.csv\",\"asof\":\"2026-11-01\"},{\"key\":\"epc\",\"label\":\"EPC & retrofit risk\",\"score\":65.7,\"headline\":\"70% of 197 EPC-rated homes at street level near SE15 4AN are rated D or below (median D); 14% are E or below and 2% F/G, which cannot be let under the current EPC-E minimum.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"level\":\"street\",\"n\":197,\"share_dg\":0.7005,\"share_eg\":0.1421,\"share_fg\":0.0203,\"median_rating\":\"D\",\"pct_dg_london\":65.7,\"mees_min_in_force\":\"E\",\"mees_proposed\":\"C by 2030 (announced, not in force)\"},\"source\":\"MHCLG domestic EPC full load via main-repo extract (OGL); latest cert per home\",\"asof\":\"2026-12-31\"},{\"key\":\"shortlets\",\"label\":\"Short-let pressure\",\"score\":81.4,\"headline\":\"18 entire-home short lets in the LSOA containing SE15 4AN (28% available >90 nights/year); short-let pressure is higher than in 81% of London LSOAs.\",\"facts\":{\"postcode\":\"SE15 4AN\",\"lsoa\":\"E01004061\",\"n_entire_home\":18,\"n_avail_gt90\":5,\"pct_entire_home_london\":81.4,\"rule_nights\":90},\"source\":\"Inside Airbnb London listings (CC BY 4.0); LSOA 2021 by nearest postcode centroid\",\"asof\":\"2026-09-17\"},{\"key\":\"pipeline\",\"label\":\"New housing supply\",\"score\":40.6,\"headline\":\"147 pipeline homes within 1 km of SE15 4AN (30 approved, not started; 117 under construction), higher than in 41% of London LSOAs. Largest: 29 units (16/AP/1896, under construction); 27 units (16/AP/2051, under construction); 10 units (24/AP/2501, approved, not started).\",\"facts\":{\"postcode\":\"SE15 4AN\",\"lsoa\":\"E01004061\",\"units_not_started_1km\":30,\"units_under_construction_1km\":117,\"units_pipeline_1km\":147,\"pct_pipeline_london\":40.6,\"top1_ref\":\"16/AP/1896\",\"top1_units\":29,\"top1_status\":\"under construction\",\"top2_ref\":\"16/AP/2051\",\"top2_units\":27,\"top2_status\":\"under construction\",\"top3_ref\":\"24/AP/2501\",\"top3_units\":10,\"top3_status\":\"approved, not started\"},\"source\":\"Planning London Datahub guest API (planningdata.london.gov.uk), Approved decisions 2015-01-01..2026-09-30 with >=1 proposed residential unit\",\"asof\":\"2026-11-01\"}],\"supplyUnits\":147,\"supplyPercentile\":40.6,\"supplyTop\":[{\"ref\":\"16/AP/1896\",\"units\":29,\"status\":\"under construction\"},{\"ref\":\"16/AP/2051\",\"units\":27,\"status\":\"under construction\"},{\"ref\":\"24/AP/2501\",\"units\":10,\"status\":\"approved, not started\"}]}",
+        "ms": 2
+      },
+      {
+        "name": "get_borough_metrics",
+        "args": {
+          "postcode": "SE15 4AN"
+        },
+        "result": "{\"code\":\"E09000028\",\"name\":\"Southwark\",\"latestPrice\":569160,\"priceChange\":-2.1233,\"netBuildup\":-1310,\"pressure\":-1.694,\"momentum\":null,\"avgRent\":2516,\"rentChange\":7.2921,\"grossYield\":5.3047,\"priceToRent\":18.8514,\"latestSales\":3912,\"salesChange\":0.0502,\"newBuildShare\":0.0698}",
+        "ms": 68
+      }
+    ],
+    "rounds": 4,
+    "verification": {
+      "total": 8,
+      "verified": 8,
+      "unverified": []
+    },
+    "repaired": false
+  }
+}

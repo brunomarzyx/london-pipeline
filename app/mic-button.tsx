@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
+import { toWav16k } from "../lib/wav";
 
 export default function MicButton({ onText }: { onText: (t: string) => void }) {
   const [rec, setRec] = useState(false);
@@ -14,7 +15,8 @@ export default function MicButton({ onText }: { onText: (t: string) => void }) {
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const m = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
+      const mime = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find((t) => MediaRecorder.isTypeSupported(t));
+      const m = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
       chunks.current = [];
       m.ondataavailable = (e) => {
         if (e.data.size) chunks.current.push(e.data);
@@ -25,7 +27,8 @@ export default function MicButton({ onText }: { onText: (t: string) => void }) {
         setBusy(true);
         try {
           const fd = new FormData();
-          fd.append("audio", new Blob(chunks.current, { type: "audio/webm" }), "ask.webm");
+          const wav = await toWav16k(new Blob(chunks.current, { type: m.mimeType || "audio/webm" }));
+          fd.append("audio", wav, "ask.wav");
           const res = await fetch("/api/transcribe", { method: "POST", body: fd });
           const j = (await res.json()) as { text?: string };
           if (j.text) onText(j.text);

@@ -1,0 +1,17 @@
+{
+  "id": "ask-se15",
+  "kind": "ask",
+  "input": {
+    "question": "Is £650k fair for a 70 sq m flat at SE15 4AN?"
+  },
+  "savedAt": "2026-11-01T15:25:25.830Z",
+  "mock": false,
+  "result": {
+    "answer": "Yes, £650,000 looks fair for a 70 sq m flat at SE15 4AN, sitting inside the size-adjusted fair range of £587,000 to £789,000 centred on £690,000. That range comes from street-level size-matched sales on Copleston Road, SE15 (n=17, median £9,863 per sq m) against this flat at £9,286 per sq m, while the unadjusted street median is £598,215 (n=18) with the asking price at the 58th percentile.",
+    "rounds": 2,
+    "verification": {
+      "total": 8,
+      "verified": 8
+    }
+  }
+}
