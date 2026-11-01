@@ -70,9 +70,16 @@ fly deploy
 | RATE_LIMIT_BRIEF_MAX | Borough brief calls per IP per window | `60` |
 | RATE_LIMIT_WINDOW_SECONDS | Rate-limit window | `3600` |
 | RATE_LIMIT_DAILY_MAX | Model calls across all visitors per 24h (global kill-switch) | `1000` in code; `300` in `fly.toml` for public deploys |
+| META_DAILY_TOKEN_CAP | Live tokens per UTC day (from `logs/usage.jsonl`) before model calls are refused with "Demo limit reached for today"; `0` disables | `200000` |
+| META_PRICE_IN_PER_M / META_PRICE_OUT_PER_M | US$ per 1M input / output tokens for `npm run spend`; unset prints "price unknown", never $0 | (unset; set from your Meta invoice) |
+| DEMO_CACHE_DIR | Override for the demo cache folder (tests) | `data/demo-cache` |
 
 ## Demo protection
 
 Rate limiter (`lib/ratelimit.ts`, in-memory, per-IP fixed window + global daily cap; `MOCK_META=1` bypasses it) guards every model-spending route: `/api/ask` + `/api/memo` + `/api/check` (extract action only; verdict is pure code) share the `model` bucket; `/api/brief/[code]` uses the `brief` bucket with its own daily share. Over-limit returns 429 with `Retry-After`. Public deploys should keep `RATE_LIMIT_DAILY_MAX=300`: enough for repeated demo walkthroughs (each Ask/memo/brief/check-extract costs one or two model calls) without letting one viral day drain the $150 credit pool. If the cap trips, the UI shows the 429 message and the owner raises it via `fly secrets` / env.
 
 Docker is not installed in this environment (`docker version`: command not found), so no local `docker build` was attempted.
+
+## Demo cache
+
+`npx tsx --env-file=.env scripts/precompute-demo.ts` runs each demo input live once (about 10 model calls) and saves `data/demo-cache/*.json`. Exact-match inputs (Ask London, `/diligence`, `/check` for SE15 4AN, flat, 70 sq m, £650k) are then served from cache with a "cached run · <date>" label, bypassing the model and rate limits; add `?live=1` to the page URL (or tick "Run live" on `/diligence`) to force a live run. The cache folder is committed, so redeploys keep it. The daily cap only applies to live calls.

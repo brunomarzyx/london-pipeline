@@ -31,6 +31,54 @@ export interface UsageRecord {
   mock: boolean;
 }
 
+export const DAILY_CAP_MESSAGE = "Demo limit reached for today";
+
+export class DailyCapError extends Error {
+  constructor() {
+    super(DAILY_CAP_MESSAGE);
+    this.name = "DailyCapError";
+  }
+}
+
+/** Daily live-token cap (env META_DAILY_TOKEN_CAP, default 200000; 0 disables). */
+export function dailyTokenCap(env: Record<string, string | undefined> = process.env): number {
+  const raw = env.META_DAILY_TOKEN_CAP;
+  if (raw === undefined || raw.trim() === "") return 200_000;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 200_000;
+}
+
+/** Live tokens logged on the UTC day of `now` (mock and untimestamped records are ignored). */
+export async function tokensUsedToday(file?: string, now: Date = new Date()): Promise<number> {
+  const p = file ?? process.env.USAGE_LOG ?? path.join(process.cwd(), "logs", "usage.jsonl");
+  let text = "";
+  try {
+    text = await fs.readFile(p, "utf8");
+  } catch {
+    return 0;
+  }
+  const day = now.toISOString().slice(0, 10);
+  let total = 0;
+  for (const line of text.split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      const r = JSON.parse(line) as Partial<UsageRecord>;
+      if (r.mock === true || typeof r.ts !== "string" || !r.ts.startsWith(day)) continue;
+      total += Number(r.total_tokens) || (Number(r.prompt_tokens) || 0) + (Number(r.completion_tokens) || 0);
+    } catch {
+      /* skip bad line */
+    }
+  }
+  return total;
+}
+
+/** Throws DailyCapError once today's logged live tokens have reached the cap. */
+export async function assertUnderDailyCap(opts: { file?: string; cap?: number; now?: Date } = {}): Promise<void> {
+  const cap = opts.cap ?? dailyTokenCap();
+  if (cap <= 0) return;
+  if ((await tokensUsedToday(opts.file, opts.now)) >= cap) throw new DailyCapError();
+}
+
 function client() {
   return new OpenAI({
     baseURL: BASE_URL,
@@ -71,6 +119,7 @@ export async function chat(
   if (MOCK) {
     reply = await readFixture(opts.fixture ?? "chat");
   } else {
+    await assertUnderDailyCap();
     const res = await client().chat.completions.create({
       model: MODEL,
       max_tokens: maxTokens,

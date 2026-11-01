@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { DailyCapError, DAILY_CAP_MESSAGE } from "./meta";
 
 /**
  * In-memory rate limiting for the routes that spend model tokens.
@@ -137,4 +138,10 @@ function tooMany(retryAfterSec: number, reason: "ip" | "global"): NextResponse {
     { error, retryAfterSec },
     { status: 429, headers: { "Retry-After": String(retryAfterSec) } },
   );
+}
+
+/** 429 for the daily token cap (see lib/meta.ts); null for any other error. */
+export function dailyCapResponse(e: unknown): NextResponse | null {
+  if (!(e instanceof DailyCapError)) return null;
+  return NextResponse.json({ error: DAILY_CAP_MESSAGE, code: "daily_cap" }, { status: 429 });
 }

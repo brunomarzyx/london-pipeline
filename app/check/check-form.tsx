@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Extraction, ListingFields, ListingVerdict } from "@/lib/listing";
+import { formatCacheLabel, type CacheLabel } from "@/lib/cache-label";
 import PriceCheck from "../area/[postcode]/widgets";
 
 const gbp = (v: number | null) =>
@@ -14,12 +15,16 @@ const POSITION = {
 } as const;
 
 async function post<T>(body: unknown): Promise<T> {
-  const res = await fetch("/api/check", {
+  const live = new URLSearchParams(window.location.search).get("live") === "1";
+  const res = await fetch(`/api/check${live ? "?live=1" : ""}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error("Request failed");
+  if (!res.ok) {
+    const j = (await res.json().catch(() => null)) as { error?: string; code?: string } | null;
+    throw new Error(j?.code === "daily_cap" ? j.error : "Request failed");
+  }
   return res.json() as Promise<T>;
 }
 
@@ -27,7 +32,7 @@ export default function CheckForm() {
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [imageName, setImageName] = useState("");
-  const [ex, setEx] = useState<Extraction | null>(null);
+  const [ex, setEx] = useState<(Extraction & { cached?: CacheLabel }) | null>(null);
   const [f, setF] = useState<ListingFields | null>(null);
   const [verdict, setVerdict] = useState<ListingVerdict | null>(null);
   const [busy, setBusy] = useState(false);
@@ -55,12 +60,12 @@ export default function CheckForm() {
     setErr("");
     setVerdict(null);
     try {
-      const e = await post<Extraction>({ action: "extract", text, image });
+      const e = await post<Extraction & { cached?: CacheLabel }>({ action: "extract", text, image });
       setEx(e);
       setF(e.fields);
       if (e.fields.postcode) setVerdict(await post<ListingVerdict>({ action: "verdict", fields: e.fields }));
-    } catch {
-      setErr("Could not read the listing. Try again.");
+    } catch (e) {
+      setErr(e instanceof Error && e.message !== "Request failed" ? e.message : "Could not read the listing. Try again.");
     }
     setBusy(false);
   }
@@ -115,7 +120,14 @@ export default function CheckForm() {
 
       {ex && f && (
         <div className="rounded-xl border bg-white p-4">
-          <h2 className="text-sm font-semibold">Extracted by Muse Spark (edit if wrong)</h2>
+          <h2 className="text-sm font-semibold">
+            Extracted by Muse Spark (edit if wrong)
+            {ex.cached ? (
+              <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs font-normal text-slate-600">
+                {formatCacheLabel(ex.cached)}
+              </span>
+            ) : null}
+          </h2>
           <div className="mt-2 grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
             <label>
               <span className="text-xs text-slate-500">Price (£)</span>

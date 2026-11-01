@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import MicButton from "./mic-button";
+import { formatCacheLabel, type CacheLabel } from "@/lib/cache-label";
 
 export const EXAMPLES = [
   "Which 5 boroughs have the biggest pipeline build-up?",
@@ -35,6 +36,7 @@ export default function AskBox() {
   const [memoVerification, setMemoVerification] = useState<Verification | null>(null);
   const [memoMarkdown, setMemoMarkdown] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cached, setCached] = useState<CacheLabel | null>(null);
   const [memoLoading, setMemoLoading] = useState(false);
 
   async function findCodes(text: string): Promise<string[]> {
@@ -57,12 +59,13 @@ export default function AskBox() {
     setQ(text);
     setLoading(true);
     setAnswer(null);
+    setCached(null);
     setVerification(null);
     setMemo(null);
     setMemoVerification(null);
     setMemoCodes([]);
     try {
-      const res = await fetch("/api/ask", {
+      const res = await fetch(`/api/ask${new URLSearchParams(window.location.search).get("live") === "1" ? "?live=1" : ""}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ question: text }),
@@ -71,6 +74,7 @@ export default function AskBox() {
       const a = data.answer ?? data.error ?? "No answer.";
       setAnswer(a);
       if (data.verification) setVerification(data.verification);
+      if (data.cached) setCached(data.cached);
       setMemoCodes(await findCodes(`${text} ${a}`));
     } catch {
       setAnswer("Request failed. Try again.");
@@ -169,6 +173,7 @@ export default function AskBox() {
           {badgeText(verification)}
         </p>
       )}
+      {cached && <p className="mt-1 text-xs text-slate-400">{formatCacheLabel(cached)}</p>}
       {memoCodes.length > 0 && !memo && (
         <button
           onClick={writeMemo}

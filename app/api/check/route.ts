@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { checkListing, extractListing } from "@/lib/listing";
-import { limitResponse } from "@/lib/ratelimit";
+import { cacheLabel, readCache, wantsLive } from "@/lib/demo-cache";
+import { limitResponse, dailyCapResponse } from "@/lib/ratelimit";
 
 const Image = z
   .string()
@@ -31,11 +32,23 @@ export async function POST(req: Request) {
   if (!parsed.success)
     return NextResponse.json({ error: "invalid request" }, { status: 400 });
   if (parsed.data.action === "extract") {
+    if (!parsed.data.image && !wantsLive(req)) {
+      const hit = await readCache<Awaited<ReturnType<typeof extractListing>>>("check", {
+        text: parsed.data.text,
+      });
+      if (hit) return NextResponse.json({ ...hit.result, cached: cacheLabel(hit) });
+    }
     const limited = limitResponse(req, "model");
     if (limited) return limited;
-    return NextResponse.json(
-      await extractListing(parsed.data.text, { image: parsed.data.image ?? null }),
-    );
+    try {
+      return NextResponse.json(
+        await extractListing(parsed.data.text, { image: parsed.data.image ?? null }),
+      );
+    } catch (e) {
+      const cap = dailyCapResponse(e);
+      if (cap) return cap;
+      throw e;
+    }
   }
   return NextResponse.json(checkListing(parsed.data.fields));
 }

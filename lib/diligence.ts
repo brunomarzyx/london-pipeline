@@ -56,7 +56,14 @@ export interface DiligenceStep {
   ms: number;
 }
 
+/** Progress events for streaming the step trace. */
+export type DiligenceEvent =
+  | { type: "thinking"; round: number }
+  | { type: "start"; name: string; args: unknown }
+  | { type: "step"; step: DiligenceStep };
+
 export interface DiligenceInput {
+  onEvent?: (e: DiligenceEvent) => void;
   text: string;
   image?: string | null;
   postcodeOverride?: string | null;
@@ -207,6 +214,7 @@ export async function runDiligence(input: DiligenceInput): Promise<DiligenceResu
   let rounds = 0;
   for (let round = 0; round < MAX_DILIGENCE_ROUNDS; round++) {
     rounds = round + 1;
+    input.onEvent?.({ type: "thinking", round: rounds });
     const fixture = mock ? mockFixtureFor(history) : undefined;
     const { reply } = await chat(transcript(), {
       system,
@@ -225,6 +233,7 @@ export async function runDiligence(input: DiligenceInput): Promise<DiligenceResu
     if (parsed.data.type === "final") {
       return await finish(parsed.data.verdict, false);
     }
+    input.onEvent?.({ type: "start", name: parsed.data.name, args: parsed.data.args });
     const t0 = Date.now();
     let result: string;
     try {
@@ -234,6 +243,7 @@ export async function runDiligence(input: DiligenceInput): Promise<DiligenceResu
     }
     const step = { name: parsed.data.name, args: parsed.data.args, result, ms: Date.now() - t0 };
     steps.push(step);
+    input.onEvent?.({ type: "step", step });
     history.push({ name: step.name, result: step.result });
   }
 

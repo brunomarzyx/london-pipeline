@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
-import { chatJSON } from "./meta";
+import { chatJSON, DailyCapError } from "./meta";
 import {
   getAreaComps,
   normalisePostcode,
@@ -137,7 +137,8 @@ export async function extractListing(
       },
     );
     return normaliseExtraction(raw, text, hasImage);
-  } catch {
+  } catch (e) {
+    if (e instanceof DailyCapError) throw e;
     return {
       fields: { ...EMPTY_FIELDS },
       areaAsPrinted: null,

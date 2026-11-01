@@ -2,9 +2,18 @@ import { createReadStream, existsSync } from "node:fs";
 import { createInterface } from "node:readline";
 import path from "node:path";
 
-// Estimate: assumed blended price per 1k tokens (prompt + completion).
-// Not a billed rate — Meta pricing may differ. Labelled estimate.
-export const PRICE_PER_1K_TOKENS_USD_ESTIMATE = 0.0;
+// Prices come only from env (US$ per 1M tokens): META_PRICE_IN_PER_M, META_PRICE_OUT_PER_M
+// (optional META_PRICE_CACHED_PER_M). Nothing is assumed; unset prints "price unknown".
+const PRICE_UNKNOWN = "price unknown — set META_PRICE_*";
+const pIn = Number(process.env.META_PRICE_IN_PER_M);
+const pOut = Number(process.env.META_PRICE_OUT_PER_M);
+const priced =
+  !!process.env.META_PRICE_IN_PER_M &&
+  !!process.env.META_PRICE_OUT_PER_M &&
+  Number.isFinite(pIn) &&
+  Number.isFinite(pOut) &&
+  pIn >= 0 &&
+  pOut >= 0;
 
 interface DayTotals {
   calls: number;
@@ -22,8 +31,8 @@ const zero = (): DayTotals => ({
   totalTokens: 0,
 });
 
-const cost = (t: number): string =>
-  `$${((t / 1000) * PRICE_PER_1K_TOKENS_USD_ESTIMATE).toFixed(4)} (estimate)`;
+const cost = (prompt: number, completion: number): string =>
+  priced ? `$${((prompt * pIn + completion * pOut) / 1e6).toFixed(4)} (estimate)` : PRICE_UNKNOWN;
 
 async function main(): Promise<void> {
   const file = path.join(process.cwd(), "logs", "usage.jsonl");
@@ -84,12 +93,14 @@ async function main(): Promise<void> {
     `tokens: prompt=${all.promptTokens} completion=${all.completionTokens} total=${all.totalTokens}`,
   );
   console.log(
-    `est. cost @ $${PRICE_PER_1K_TOKENS_USD_ESTIMATE}/1k tokens: ${cost(all.totalTokens)}`,
+    priced
+      ? `est. cost @ $${pIn}/1M in, $${pOut}/1M out: ${cost(all.promptTokens, all.completionTokens)}`
+      : `est. cost: ${PRICE_UNKNOWN}`,
   );
   console.log("by day:");
   for (const [day, d] of [...byDay.entries()].sort()) {
     console.log(
-      `  ${day}: calls=${d.calls} live=${d.liveCalls} prompt=${d.promptTokens} completion=${d.completionTokens} total=${d.totalTokens} cost=${cost(d.totalTokens)}`,
+      `  ${day}: calls=${d.calls} live=${d.liveCalls} prompt=${d.promptTokens} completion=${d.completionTokens} total=${d.totalTokens} cost=${cost(d.promptTokens, d.completionTokens)}`,
     );
   }
 }

@@ -1,18 +1,52 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MicButton from "../mic-button";
 import type { DiligenceResult } from "@/lib/diligence";
+import { formatCacheLabel, type CacheLabel } from "@/lib/cache-label";
 
 type ApiResult = DiligenceResult & { error?: string };
 
-async function post(body: unknown): Promise<ApiResult> {
-  const res = await fetch("/api/diligence", {
+/** A trace row: running (no result yet) or finished. */
+interface TraceRow {
+  name: string;
+  args: unknown;
+  result?: string;
+  ms?: number;
+}
+
+const DEMO_TEXT = "2 bed flat on Copleston Road, London SE15 4AN. £650,000. 70 sq m internal area.";
+
+/** POSTs with stream:true and reads server-sent events (thinking, start, step, done, error). */
+async function stream(
+  body: unknown,
+  live: boolean,
+  on: (event: string, data: Record<string, unknown>) => void,
+): Promise<void> {
+  const res = await fetch(`/api/diligence${live ? "?live=1" : ""}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...(body as object), stream: true }),
   });
-  if (!res.ok) throw new Error("Request failed");
-  return res.json() as Promise<ApiResult>;
+  if (!res.ok || !res.body) {
+    const j = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(j?.error ?? "Request failed");
+  }
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i: number;
+    while ((i = buf.indexOf("\n\n")) >= 0) {
+      const block = buf.slice(0, i);
+      buf = buf.slice(i + 2);
+      const ev = /^event: (.+)$/m.exec(block)?.[1];
+      const data = /^data: (.+)$/m.exec(block)?.[1];
+      if (ev && data) on(ev, JSON.parse(data) as Record<string, unknown>);
+    }
+  }
 }
 
 const VERDICT_STYLE: Record<string, string> = {
@@ -31,6 +65,13 @@ export default function DiligenceForm() {
   const [result, setResult] = useState<ApiResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [rows, setRows] = useState<TraceRow[]>([]);
+  const [status, setStatus] = useState("");
+  const [cached, setCached] = useState<CacheLabel | null>(null);
+  const [live, setLive] = useState(false);
+  useEffect(() => {
+    setLive(new URLSearchParams(window.location.search).get("live") === "1");
+  }, []);
 
   function onFile(file: File | undefined) {
     setImage(null);
@@ -50,20 +91,37 @@ export default function DiligenceForm() {
     setBusy(true);
     setErr("");
     setResult(null);
+    setRows([]);
+    setCached(null);
+    setStatus("Starting…");
     try {
       const p = price.replace(/[^0-9]/g, "");
-      setResult(
-        await post({
-          text,
-          image,
-          postcode: postcode.trim() || null,
-          price: p ? Number(p) : null,
-          goal,
-        }),
+      await stream(
+        { text, image, postcode: postcode.trim() || null, price: p ? Number(p) : null, goal },
+        live,
+        (event, data) => {
+          if (event === "thinking") setStatus(`Agent reasoning (round ${String(data.round)})…`);
+          else if (event === "start")
+            setRows((r) => [...r, { name: String(data.name), args: data.args }]);
+          else if (event === "step") {
+            const step = data.step as TraceRow;
+            setRows((r) => {
+              const open = r.findIndex((x) => x.result === undefined && x.name === step.name);
+              if (open < 0) return [...r, step];
+              const next = r.slice();
+              next[open] = step;
+              return next;
+            });
+          } else if (event === "done") {
+            setResult(data.result as ApiResult);
+            setCached((data.cached as CacheLabel | undefined) ?? null);
+          } else if (event === "error") setErr(String(data.error ?? "Could not run diligence."));
+        },
       );
-    } catch {
-      setErr("Could not run diligence. Try again.");
+    } catch (e) {
+      setErr(e instanceof Error && e.message ? e.message : "Could not run diligence. Try again.");
     }
+    setStatus("");
     setBusy(false);
   }
 
@@ -86,8 +144,11 @@ export default function DiligenceForm() {
             placeholder="Paste the description, price and address from the listing"
             className={`${input} mt-1`}
           />
-          <div className="mt-1">
+          <div className="mt-1 flex items-center gap-3">
             <MicButton onText={(t) => setText(t)} />
+            <button type="button" onClick={() => setText(DEMO_TEXT)} className="text-xs text-sky-700 underline">
+              Use demo listing
+            </button>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -137,32 +198,49 @@ export default function DiligenceForm() {
         >
           {busy ? "Running checks…" : "Run due diligence"}
         </button>
+        <label className="flex items-center gap-2 text-xs text-slate-600">
+          <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} />
+          Run live (skip cached demo run)
+        </label>
         {err ? <p className="text-sm text-red-700">{err}</p> : null}
       </div>
 
       <div className="space-y-3">
-        {result && !result.error ? (
+        {rows.length > 0 || busy || (result && !result.error) ? (
           <>
             <div className="rounded-xl border bg-white p-4">
-              <h2 className="text-sm font-semibold text-slate-500">Live step trace ({result.steps.length} steps)</h2>
+              <h2 className="text-sm font-semibold text-slate-500">
+                Live step trace ({rows.filter((r) => r.result !== undefined).length} steps)
+                {cached ? (
+                  <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs font-normal text-slate-600">
+                    {formatCacheLabel(cached)}
+                  </span>
+                ) : null}
+              </h2>
               <ol className="mt-2 space-y-2">
-                {result.steps.map((s, i) => (
+                {rows.map((s, i) => (
                   <li key={i} className="rounded border border-slate-200 p-2 text-xs">
                     <div className="font-mono font-semibold">
-                      {i + 1}. {s.name} <span className="font-normal text-slate-500">{s.ms} ms</span>
+                      {i + 1}. {s.name}{" "}
+                      <span className="font-normal text-slate-500">
+                        {s.result === undefined ? "running…" : `done · ${s.ms} ms`}
+                      </span>
                     </div>
                     <div className="mt-1 break-words font-mono text-slate-600">
                       args: {JSON.stringify(s.args)}
                     </div>
-                    <div className="mt-1 max-h-24 overflow-y-auto break-words text-slate-700">
-                      {s.result.slice(0, 400)}
-                      {s.result.length > 400 ? "…" : ""}
-                    </div>
+                    {s.result !== undefined ? (
+                      <div className="mt-1 max-h-24 overflow-y-auto break-words text-slate-700">
+                        {s.result.slice(0, 400)}
+                        {s.result.length > 400 ? "…" : ""}
+                      </div>
+                    ) : null}
                   </li>
                 ))}
+                {busy && status ? <li className="text-xs text-slate-500">{status}</li> : null}
               </ol>
             </div>
-            {v ? (
+            {v && result ? (
               <div className="rounded-xl border bg-white p-4">
                 <span className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ${VERDICT_STYLE[v.verdict] ?? ""}`}>
                   {v.verdict}
