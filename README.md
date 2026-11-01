@@ -1,28 +1,75 @@
 # London Pipeline
 
-See where London's housing construction pipeline is building up or drying out, borough by borough, against prices — and ask about it in plain English.
+London's housing supply data is public but scattered — Land Registry prices in one place, MHCLG starts and completions in another, boundaries somewhere else — so nobody can see at a glance where the construction pipeline is building up and could weigh on prices. London Pipeline puts all 33 boroughs on one map with an analyst you can question: borough cycle phases, street-level fair prices from 4.6 million EPC-matched sales, a value-vs-momentum screen, a 10-signal Area Risk Score with buyer and investor lenses, and analyst memos with every figure verified against source data.
 
-London supply data is public but scattered across GLA dashboards, planning exports and Land Registry files. A student fund analyst, a small developer or a journalist can't quickly see which boroughs have a large pipeline that could weigh on prices. This puts it on one map, with an analyst you can question.
+![Dashboard: London boroughs coloured by supply pressure](docs/img/dashboard.png)
+![Area page for E14 9AF on the investor lens](docs/img/area-investor-e14.png)
 
-Live headline (computed from data on load): London house prices are down 20.8% in real terms over five years — 23.9% below their 10-year peak — while Tokyo sits just 2.8% below peak. See the Global tab.
+## What it does
 
-## 30-second quick-start
+- Borough cycle map: 33-borough choropleth (price change, pipeline build-up, supply pressure, starts momentum, yield, cycle phase) with a ranked table.
+- Ask London: plain-English questions answered by a tool-calling analyst over borough, street, global and risk data, with a figure verifier.
+- Street comps + fair range (`/area/[postcode]`): size-adjusted £/sq m fair range with a street → borough fallback ladder and repeat-sales momentum.
+- Value screen (`/screen`): LSOAs ≥10% below their borough on £/sq m where MSOA momentum beats the borough, with transport and deprivation filters.
+- Area Risk Score: one 0–100 score per postcode from 10 context signals, buyer/investor lens toggle, supply-pressure callouts.
+- Analyst memo: structured call with evidence, risks and what-would-change-it, badge-verified figure by figure; download from any borough or area page.
 
-Mock mode (zero spend):
+## How Muse Spark is used
+
+All model calls go through one wrapper, `lib/meta.ts` (OpenAI SDK against `META_BASE_URL`, model `muse-spark-1.3`), which logs prompt, completion and cached tokens per call to `logs/usage.jsonl` and serves fixtures under `MOCK_META=1`.
+
+- Ask London (`prompts/ask.md`): six tools — `list_boroughs`, `get_borough_metrics`, `rank_boroughs`, `get_city_metrics`, `get_area_comps`, `get_area_risk` — then a 2–3 sentence answer citing only returned numbers; a verifier rechecks every figure against tool results.
+- Borough briefs (`prompts/brief.md`): one borough's metrics in, validated JSON `{headline, supply_view, price_view, risk_flag, confidence}` out (zod, retry-once, graceful fallback).
+- Analyst memo (`prompts/memo.md`): one–two boroughs in, one JSON memo out; every figure checked against tool results, "✓ n/m figures verified" badge; market read-across is qualitative only.
+- Listing check (`prompts/listing.md`): extracts price, floor area, postcode, type, bedrooms from pasted text (+ optional floorplan image); verdict reuses the fair-range code path.
+- Cycle explanation (`prompts/cycle.md`): one paragraph on why a borough maps to recovery / expansion / hypersupply / recession, with a deterministic fallback.
+
+## Data
+
+All open data; see [data/SOURCES.md](data/SOURCES.md) for URLs and build scripts.
+
+| Source | Licence | As of |
+|---|---|---|
+| HM Land Registry UK House Price Index (borough averages) | OGL v3 | Aug 2026 |
+| MHCLG Live Tables 253 (annual) + 253a (quarterly) starts/completions | OGL v3 | FY 2025-26 / Q2 2026 |
+| GLA statistical GIS boundaries (maps carry the GLA copyright notice) | GLA | 2011 |
+| ONS Price Index of Private Rents (City of London suppressed → null) | OGL v3 | Sep 2026 |
+| HM Land Registry Price Paid 2024–2025 London extract (volumes, new-build share) | OGL v3 | 2025 |
+| Price Paid 2016–Sep 2026 + ONS postcode lookup + OS Code-Point Open (street build) | OGL v3 | Sep 2026 |
+| MHCLG domestic EPC register, 4.6m London certificates matched to sales (90.1%) | OGL v3 | Dec 2026 |
+| IMD 2025 deprivation; TfL PTAL 2015 transport access; police.uk street crime | OGL v3 / TfL open data | 2025 / 2015 / Sep 2025–Aug 2026 |
+| Environment Agency Flood Map for Planning (flood zones) | OGL v3 | Aug 2023 |
+| GLA/TfL London Atmospheric Emissions Inventory 2022 (air) | OGL v3 | 2022 |
+| Defra strategic noise mapping Round 4, road + rail (noise) | OGL v3 | 2022 |
+| DfE GIAS + Ofsted (schools) | OGL v3 | Oct 2026 / Sep 2026 |
+| TfL open data + PTAL (transport); OS Open Greenspace (greenspace) | TfL open data / OS Open Data | Sep 2026 / Nov 2026 |
+| planning.data.gov.uk conservation/listed/article-4 (heritage) | OGL v3 | Nov 2026 |
+| Inside Airbnb London listings (short lets) | CC BY 4.0 | Sep 2026 |
+| Planning London Datahub guest API approvals (pipeline) | GLA | Nov 2026 |
+| BIS house prices + CPI + policy rates (8 global cities) | BIS | to Sep/Oct 2026 |
+
+## Run locally
 
 ```bash
 npm install
-MOCK_META=1 npm run dev   # open http://localhost:3000
+MOCK_META=1 npm run dev   # open http://localhost:3000, zero model spend
 ```
 
 Live (Meta Muse Spark):
 
 ```bash
-cp .env.example .env   # add MODEL_API_KEY
+cp .env.example .env   # add MODEL_API_KEY, keep META_BASE_URL + META_MODEL
 npm run dev
 ```
 
-Checks: `npm run typecheck` · `npm test` (runs with `MOCK_META=1`; 95 tests passing) · `npm run build`
+Checks: `npx tsc --noEmit` · `MOCK_META=1 npx vitest run --cache=false` (24 files, 172 tests) · `npm run build`
+
+## Limits
+
+- The screen is a starting list, not a valuation; repeat-sales momentum is MSOA-level, not street-level.
+- Risk scores are within-London bands, not absolute risk; postcodes with different signal coverage are not strictly comparable.
+- Prices are averages from source data, not forecasts; missing values show as "no data", never invented.
+- Approvals data is not in this build (GLA Planning London Datahub needs an access request).
 
 ## Architecture
 

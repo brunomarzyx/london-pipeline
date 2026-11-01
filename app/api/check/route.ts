@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { checkListing, extractListing } from "@/lib/listing";
+import { limitResponse } from "@/lib/ratelimit";
 
 const Image = z
   .string()
@@ -29,9 +30,12 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json({ error: "invalid request" }, { status: 400 });
-  if (parsed.data.action === "extract")
+  if (parsed.data.action === "extract") {
+    const limited = limitResponse(req, "model");
+    if (limited) return limited;
     return NextResponse.json(
       await extractListing(parsed.data.text, { image: parsed.data.image ?? null }),
     );
+  }
   return NextResponse.json(checkListing(parsed.data.fields));
 }

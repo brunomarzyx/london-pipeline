@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+data/raw
+data/street
+logs
+.env
+.env.local
+*.log
+.DS_Store
+__pycache__
