@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { getStreetDb } from "@/lib/street";
+import StreetUnavailable from "@/app/street-unavailable";
 import { getValueScreen, MAX_DISCOUNT, SCREEN_MIN_N, SCREEN_MIN_PAIRS } from "@/lib/screen";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +10,7 @@ const pct = (v: number | null) =>
   v == null ? "—" : `${v >= 0 ? "+" : "−"}${Math.abs(v * 100).toFixed(1)}%`;
 
 export default function ScreenPage({ searchParams }: { searchParams: { transport?: string; deprived?: string } }) {
+  if (!getStreetDb()) return <StreetUnavailable />;
   const opts = { goodTransport: searchParams.transport === "1", notDeprived: searchParams.deprived === "1" };
   const { rows, candidates, asof } = getValueScreen(30, opts);
   return (

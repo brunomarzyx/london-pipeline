@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { writeMemo } from "@/lib/memo";
+import { limitResponse } from "@/lib/ratelimit";
 
 const Body = z.object({ codes: z.array(z.string().min(1).max(12)).min(1).max(2) });
 
 export async function POST(req: Request) {
+  const limited = limitResponse(req, "model");
+  if (limited) return limited;
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json({ error: "codes must be 1–2 borough codes" }, { status: 400 });

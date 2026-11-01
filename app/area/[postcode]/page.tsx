@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAreaComps, normalisePostcode } from "@/lib/street";
+import { getAreaComps, getStreetDb, normalisePostcode } from "@/lib/street";
+import StreetUnavailable from "@/app/street-unavailable";
 import PriceCheck, { AreaMap } from "./widgets";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +35,7 @@ export default function AreaPage({
   const raw = decodeURIComponent(params.postcode);
   const pc = normalisePostcode(raw);
   if (!pc) notFound();
+  if (!getStreetDb()) return <StreetUnavailable />;
   const type =
     searchParams.type === "house"
       ? "house"
