@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import MicButton from "./mic-button";
 
 export const EXAMPLES = [
   "Which 5 boroughs have the biggest pipeline build-up?",
@@ -153,6 +154,7 @@ export default function AskBox() {
           maxLength={500}
           className="min-w-0 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm placeholder:text-slate-500"
         />
+        <MicButton onText={(t) => setQ(t)} />
         <button
           type="submit"
           disabled={loading}

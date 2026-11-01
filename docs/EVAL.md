@@ -66,3 +66,13 @@ Rounds: 2; verifier: 8/8 PASS.
 Answer: E14 9AF has higher investor risk at 61 (Elevated) than SE15 4AN at 47 (Moderate). E14 9AF is driven by 13,145 pipeline homes within 1 km of E14 9AF (2,327 approved, not started; 10,818 under construction), Flood Zone 3 (high probability) and 20 entire-home short lets in its LSOA, with EPC strength at median B. SE15 4AN has 147 pipeline homes within 1 km of SE15 4AN (30 approved, not started; 117 under construction), Flood Zone 1 (low probability) and EPC risk at median D, with 18 entire-home short lets in its LSOA.
 
 Rounds: 5 (model made 4 tool calls for a 2-postcode question); verifier: 3/3 PASS.
+
+## Due-diligence agent
+
+Test fixture (invented listing, not a real property): 2 bedroom flat on Copleston Road, London SE15 4AN. Asking price £650,000. Floor area 70 sq m. Goal: buyer.
+
+Live loop trace (10 model calls): extract_listing → {price 650000, sqm 70, postcode SE15 4AN, type flat, bedrooms 2} → get_area_comps → street Copleston Road n=18, median £598,215, p25 £511,250, p75 £716,060, fair range £587,000/£690,000/£789,000, asking percentile 58, asking £9,286/sq m vs median £9,863 → get_area_risk (buyer) → score 42, band Moderate, 10/10 → get_neighbourhood → LSOA E01004061, imdDecile 5, ptal 5, crime 182, pctile 60 → get_borough_metrics (resolved E09000028 Southwark) → latestPrice 569160, priceChange -2.1233, grossYield 5.3047. The loop then hit the round cap with three truncated final replies (long transcript + 4096-token cap cut the verdict JSON), so the cap fallback returned "not enough data" with 0 figures rather than a guessed verdict.
+
+Fix: slim tool outputs in the model transcript (1500 chars each, full text kept for the verifier) and raise diligence calls to maxTokens 8192. Final verdict then completed in 1 further live call: verdict "looks fair" — asking 650000 within 587000–789000, below midpoint 690000; risks crime 182 (percentile 60), area risk 42 Moderate, borough price 569160 change -2.1233; strengths PTAL 5 (PTAI 23.3), 9286/sq m below street median 9863. Verifier: 11/11 PASS. Total 14 live calls this phase (13 chat + 1 probe); 1 spare kept.
+
+Voice probe: GET /models lists muse-voice-transcribe-1.0, so /api/transcribe (multipart audio → text) plus a mic button on Ask London and the diligence page were added. Mock transcribe handler: 200 with fixture text; 400 on non-multipart. Live transcription not exercised (no budget left).
