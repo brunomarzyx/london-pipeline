@@ -52,12 +52,12 @@ describe("RateLimiter", () => {
 
 describe("env and IP parsing", () => {
   it("reads env with defaults and ignores junk", () => {
-    expect(readBucketMax("model", {})).toBe(15);
-    expect(readBucketMax("brief", {})).toBe(60);
-    expect(readBucketMax("model", { RATE_LIMIT_MAX: "5" })).toBe(5);
-    expect(readBucketMax("model", { RATE_LIMIT_MAX: "abc" })).toBe(15);
-    expect(readDailyMax({ RATE_LIMIT_DAILY_MAX: "0" })).toBe(0);
-    expect(readWindowMs({ RATE_LIMIT_WINDOW_SECONDS: "60" })).toBe(60000);
+    expect(readBucketMax("model", {} as unknown as NodeJS.ProcessEnv)).toBe(15);
+    expect(readBucketMax("brief", {} as unknown as NodeJS.ProcessEnv)).toBe(60);
+    expect(readBucketMax("model", ({ RATE_LIMIT_MAX: "5" } as unknown as NodeJS.ProcessEnv))).toBe(5);
+    expect(readBucketMax("model", ({ RATE_LIMIT_MAX: "abc" } as unknown as NodeJS.ProcessEnv))).toBe(15);
+    expect(readDailyMax(({ RATE_LIMIT_DAILY_MAX: "0" } as unknown as NodeJS.ProcessEnv))).toBe(0);
+    expect(readWindowMs(({ RATE_LIMIT_WINDOW_SECONDS: "60" } as unknown as NodeJS.ProcessEnv))).toBe(60000);
   });
 
   it("prefers fly-client-ip, then first x-forwarded-for hop", () => {
