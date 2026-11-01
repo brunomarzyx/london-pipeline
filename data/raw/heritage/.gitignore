@@ -1,0 +1,2 @@
+# downloads over 10 MB stay out of git
+*.csv
