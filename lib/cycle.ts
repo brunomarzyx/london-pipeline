@@ -28,7 +28,12 @@ export function fallbackCycleParagraph(
   return `${name} is in the ${PHASE_LABEL[phase].toLowerCase()} phase: its 12-month price change is ${fmtPct(priceChange)} and its supply pressure is ${fmtPressure(pressure)}. No model explanation is available; use the pipeline and price figures on this page.`;
 }
 
+const cycleCache = new Map<string, { text: string; at: number }>();
+const CYCLE_TTL_MS = 60 * 60 * 1000;
+
 export async function explainCyclePhase(code: string): Promise<string> {
+  const hit = cycleCache.get(code);
+  if (hit && Date.now() - hit.at < CYCLE_TTL_MS) return hit.text;
   const d = getBoroughDetail(code);
   if (!d) return fallbackCycleParagraph(code, "unknown", null, null);
   const phase = classifyCycle(d.priceChange, d.pressure, d.momentum);
@@ -53,6 +58,8 @@ export async function explainCyclePhase(code: string): Promise<string> {
       effort: "low",
       fixture: "cycle",
     });
+    // Cache model text for an hour: the borough page renders server-side, so this caps spend per code.
+    if (process.env.MOCK_META !== "1") cycleCache.set(code, { text: out.explanation, at: Date.now() });
     return out.explanation;
   } catch {
     return fallbackCycleParagraph(d.name, phase, d.priceChange, d.pressure);
