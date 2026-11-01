@@ -21,10 +21,9 @@ export interface CompSale {
   postcode: string;
   lat: number | null;
   lon: number | null;
-  floor_area?: number | null;
-  ppsm?: number | null;
-  epc_rating?: string | null;
 }
+// Per-sale EPC fields (floor area, £/sq m, rating) are deliberately NOT part of CompSale:
+// address-level EPC records are not published. EPC is used only in aggregate.
 
 /** £ per sq m view: price per floor area from Land Registry sales matched to EPC certificates. */
 export interface PpsmView {
@@ -301,7 +300,7 @@ export function getAreaComps(
   if (chosenLevel === "street") {
     comps = d
       .prepare(
-        `SELECT address, date, price, postcode, lat, lon, floor_area, ppsm, epc_rating FROM sales WHERE street_key=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
+        `SELECT address, date, price, postcode, lat, lon FROM sales WHERE street_key=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
       )
       .all(prow.street_key) as CompSale[];
   } else {
@@ -309,7 +308,7 @@ export function getAreaComps(
     // p25/med/p75 already summarise the wider area.
     comps = d
       .prepare(
-        `SELECT address, date, price, postcode, lat, lon, floor_area, ppsm, epc_rating FROM sales WHERE sector=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
+        `SELECT address, date, price, postcode, lat, lon FROM sales WHERE sector=? ${typeFilter} ORDER BY date DESC LIMIT 12`,
       )
       .all(prow.sector) as CompSale[];
   }

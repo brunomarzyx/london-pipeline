@@ -173,8 +173,6 @@ export default function MemoPage({
               <th className="py-0.5">Address</th>
               <th>Date</th>
               <th className="text-right">Price</th>
-              <th className="text-right">Size</th>
-              <th className="text-right">£/sq m</th>
             </tr>
           </thead>
           <tbody>
@@ -183,10 +181,6 @@ export default function MemoPage({
                 <td className="py-0.5">{c.address}</td>
                 <td>{c.date}</td>
                 <td className="text-right tabular-nums">{gbp(c.price)}</td>
-                <td className="text-right tabular-nums">
-                  {c.floor_area ? `${Math.round(c.floor_area)} m²` : "—"}
-                </td>
-                <td className="text-right tabular-nums">{c.ppsm ? gbp(c.ppsm) : "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -194,7 +188,7 @@ export default function MemoPage({
       </section>
 
       <footer className="mt-3 border-t pt-2 text-[11px] text-slate-500">
-        Sources: {r.source}; floor areas from the MHCLG EPC register matched to Land Registry sales;
+        Sources: {r.source}; £/sq m from MHCLG EPC floor areas used in aggregate only;
         TfL PTAL (2015); English Indices of Deprivation 2025; data.police.uk. Data to {r.asof}; memo
         prepared {generated}. Guide only, not a valuation or financial advice.
       </footer>

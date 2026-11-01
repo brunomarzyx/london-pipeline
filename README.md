@@ -5,6 +5,13 @@ London's housing supply data is public but scattered — Land Registry prices in
 ![Dashboard: London boroughs coloured by supply pressure](docs/img/dashboard.png)
 ![Area page for E14 9AF on the investor lens](docs/img/area-investor-e14.png)
 
+
+## Built during the hackathon
+
+Built 26 Oct to 4 Nov 2026 for the Meta AI Developer Hackathon. All code in this repo was written during the event (first commit: 2026-10-30). The public datasets listed under [Data sources and licences](#data-sources-and-licences) were downloaded and processed during the event.
+
+> For information only. Not financial, investment or property advice. Figures are estimates from public data and may be wrong.
+
 ## What it does
 
 - Borough cycle map: 33-borough choropleth (price change, pipeline build-up, supply pressure, starts momentum, yield, cycle phase) with a ranked table.
@@ -139,7 +146,7 @@ Method: overall score is the weighted mean of available component scores, rounde
 
 Limits: scores are within-London percentiles/bands, not absolute risk; postcodes with different coverage are not strictly comparable. Flood zones are Aug 2023; PTAL underlies access at 2015. Ask London quotes the score only via the `get_area_risk` tool, and the number verifier checks every figure. The `/screen` Risk column and filters (max score, exclude Flood Zone 3) read a precomputed per-LSOA index (`data/context/area-score-lsoa.json`, rebuilt with `scripts/build-area-score-lsoa.ts`) because live-scoring all rows costs ~3s.
 
-## Data sources and limitations
+## Data sources and licences
 
 Sources (OGL v3, pulled 30 Oct 2026; see [data/SOURCES.md](data/SOURCES.md)):
 
@@ -150,6 +157,17 @@ Sources (OGL v3, pulled 30 Oct 2026; see [data/SOURCES.md](data/SOURCES.md)):
 - Sales: Land Registry Price Paid, calendar 2025 vs 2024 volumes and new-build share.
 - Street-level comps: `data/street.db`, built by `scripts/street/run_all.sh` (see [data/SOURCES.md](data/SOURCES.md) "Street-level data"). Inputs: Land Registry Price Paid 2016 to Sep 2026; MHCLG domestic EPC register (4.6m London certificates, floor areas); IMD 2025; TfL PTAL 2015; police.uk street crime, Sep 2025 to Aug 2026.
 - Global cities: BIS detailed residential property prices + long CPI + policy rates (pulled 30 Oct 2026; London, Paris, Berlin, Tel Aviv, Toronto, Sao Paulo, Sydney, Tokyo).
+
+Attribution:
+
+- Contains HM Land Registry data © Crown copyright and database right 2026. This data is licensed under the Open Government Licence v3.0.
+- Contains OS data © Crown copyright and database right 2026
+- Contains Royal Mail data © Royal Mail copyright and Database right 2026
+- Contains National Statistics data © Crown copyright and database right 2026
+- Powered by TfL Open Data
+- Short-let listings: Inside Airbnb (insideairbnb.com), licensed CC BY 4.0.
+- Global city prices, CPI and policy rates: Bank for International Settlements (BIS) data portal, data.bis.org.
+- EPC data is used only in aggregate (£/sq m by area); no address-level EPC records are published.
 
 Limitations:
 
@@ -162,3 +180,11 @@ Limitations:
 ## Stack
 
 Next.js (App Router) + TypeScript strict, Tailwind, Leaflet + OpenStreetMap, recharts, zod, SQLite (`better-sqlite3`), Vitest. Model: Muse Spark via the Meta Model API.
+
+## Disclaimer
+
+For information only. Not financial, investment or property advice. Figures are estimates from public data and may be wrong.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). Data remains under its original licences listed above.

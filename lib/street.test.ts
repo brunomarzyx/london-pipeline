@@ -94,6 +94,11 @@ describe("getAreaComps (fixture)", () => {
     expect(r.ladder[0].n).toBe(2);
     expect(r.comps.length).toBeGreaterThan(0);
     expect(r.comps.length).toBeLessThanOrEqual(12);
+    for (const c of r.comps) {
+      expect(c).not.toHaveProperty("floor_area");
+      expect(c).not.toHaveProperty("ppsm");
+      expect(c).not.toHaveProperty("epc_rating");
+    }
     expect(r.asof).toBe("2026-09-30");
   });
   it("uses n_flat/n_house when a type is given", () => {

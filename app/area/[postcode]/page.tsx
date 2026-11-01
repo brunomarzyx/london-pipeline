@@ -340,9 +340,6 @@ export default function AreaPage({
               <th className="py-1">Address</th>
               <th>Date</th>
               <th className="text-right">Price</th>
-              <th className="text-right">Size</th>
-              <th className="text-right">£/sq m</th>
-              <th className="text-right">EPC</th>
             </tr>
           </thead>
           <tbody>
@@ -353,9 +350,6 @@ export default function AreaPage({
                 <td className="text-right tabular-nums">
                   £{c.price.toLocaleString("en-GB")}
                 </td>
-                <td className="text-right tabular-nums">{c.floor_area ? `${Math.round(c.floor_area)} m²` : "—"}</td>
-                <td className="text-right tabular-nums">{c.ppsm ? gbp(c.ppsm) : "—"}</td>
-                <td className="text-right">{c.epc_rating ?? "—"}</td>
               </tr>
             ))}
           </tbody>
