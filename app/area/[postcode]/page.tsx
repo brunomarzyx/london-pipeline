@@ -65,6 +65,16 @@ export default function AreaPage({
       <p className="text-sm text-slate-500">
         Street-level comparables · {r.source} · to {r.asof}
       </p>
+      <Link
+        href={`/area/${encodeURIComponent(r.postcode)}/memo?${new URLSearchParams({
+          ...(type ? { type } : {}),
+          ...(sqm ? { sqm: String(sqm) } : {}),
+          ...(Number.isFinite(priceParam) && priceParam > 0 ? { price: String(priceParam) } : {}),
+        })}`}
+        className="mt-1 inline-block rounded border border-sky-700 px-2 py-0.5 text-sm text-sky-700 hover:bg-sky-50"
+      >
+        Download memo
+      </Link>
 
       <div className="mt-4 rounded-xl border bg-white p-4">
         <p className="text-lg">
