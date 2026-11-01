@@ -47,7 +47,7 @@ export default function GlobalView() {
           Real house-price momentum (city BIS series deflated with national CPI) against central-bank
           policy rates. Supply data is not comparable across cities, so this view is prices and rates only.
         </p>
-        <table className="mt-3 w-full min-w-[760px] text-sm">
+        <div className="mt-3 overflow-x-auto"><table className="w-full min-w-[760px] text-sm">
           <thead>
             <tr className="border-b text-left text-slate-500">
               <th className="px-2 py-1.5">#</th>
@@ -90,7 +90,7 @@ export default function GlobalView() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
         <p className="mt-2 text-xs text-slate-500">
           Sources: BIS detailed residential property prices, long CPI series and policy rates
           (data.bis.org, pulled 30 Oct 2026; see data/SOURCES.md). City series are nominal;

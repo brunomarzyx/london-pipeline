@@ -170,7 +170,7 @@ export default function Dashboard({ metrics, headline, streetOn }: { metrics: Bo
     ?? ((v: number | null) => (v == null ? "no data" : String(v)));
 
   return (
-    <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
+    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100 md:h-screen">
       <header className="flex flex-wrap items-center gap-3 border-b border-slate-800 px-5 py-3">
         <h1 className="text-lg font-semibold tracking-tight">London Pipeline</h1>
         <span className="text-sm text-slate-400">supply vs price by borough</span>
@@ -186,7 +186,7 @@ export default function Dashboard({ metrics, headline, streetOn }: { metrics: Bo
             </button>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 md:ml-auto md:w-auto">
           <AskBox />
           {streetOn ? (
             <form
@@ -202,7 +202,7 @@ export default function Dashboard({ metrics, headline, streetOn }: { metrics: Bo
                 onChange={(e) => setPc(e.target.value)}
                 placeholder="Postcode e.g. E14 9AF"
                 aria-label="London postcode"
-                className="w-40 rounded-full bg-slate-900 px-3 py-1 text-sm uppercase text-slate-200 placeholder:normal-case placeholder:text-slate-500"
+                className="w-36 rounded-full bg-slate-900 px-3 py-1 text-sm uppercase text-slate-200 placeholder:normal-case placeholder:text-slate-500"
               />
               <select
                 value={pcType}
@@ -245,10 +245,10 @@ export default function Dashboard({ metrics, headline, streetOn }: { metrics: Bo
           {headline}
         </div>
       )}
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         {view === "global" ? <GlobalView /> : (
         <>
-        <div className="relative min-w-0 flex-1">
+        <div className="relative h-[55vh] min-w-0 shrink-0 md:h-auto md:flex-1 md:shrink">
           <div ref={mapRef} className="absolute inset-0 z-0" />
           <div className="absolute bottom-6 left-3 z-10 rounded-lg bg-white/95 p-3 text-xs text-slate-800 shadow">
             <div className="mb-1 font-semibold">{isPhase ? "Cycle phase" : METRICS.find((m) => m.key === metric)!.label}</div>
@@ -272,9 +272,9 @@ export default function Dashboard({ metrics, headline, streetOn }: { metrics: Bo
             )}
           </div>
         </div>
-        <aside className="hidden w-[380px] shrink-0 flex-col border-l border-slate-800 bg-white text-slate-900 md:flex">
+        <aside className="flex w-full shrink-0 flex-col border-t border-slate-800 bg-white text-slate-900 md:min-h-0 md:w-[380px] md:border-l md:border-t-0">
           <div className="border-b px-4 py-2 text-sm font-semibold">Ranked — {isPhase ? "Cycle phase" : METRICS.find((m) => m.key === metric)!.label}</div>
-          <div className="min-h-0 flex-1 overflow-auto">
+          <div className="max-h-[60vh] min-h-0 overflow-auto md:max-h-none md:flex-1">
             <table className="w-full text-sm">
               <tbody>
                 {ranked.map((r, i) => (

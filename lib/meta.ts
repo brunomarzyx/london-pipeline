@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
+import { estimateCost } from "./usage";
 
 const BASE_URL = process.env.META_BASE_URL ?? "https://api.meta.ai/v1";
 const MODEL = process.env.META_MODEL ?? "muse-spark-1.3";
@@ -22,6 +23,8 @@ export interface UsageRecord {
   prompt_tokens: number;
   completion_tokens: number;
   total_tokens: number;
+  /** Estimated US$ (null unless META_PRICE_* env vars are set). */
+  est_cost_usd: number | null;
   mock: boolean;
 }
 
@@ -90,6 +93,7 @@ export async function chat(
     prompt_tokens: promptTokens,
     completion_tokens: completionTokens,
     total_tokens: totalTokens,
+    est_cost_usd: MOCK ? 0 : estimateCost(promptTokens, cached, completionTokens),
     mock: MOCK,
   };
   await logUsage(usage);
