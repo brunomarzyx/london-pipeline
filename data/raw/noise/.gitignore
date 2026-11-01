@@ -1,0 +1,4 @@
+# Ignore large raw downloads (>10 MB). Keep this file and small manifests.
+*
+!.gitignore
+!MANIFEST.txt
