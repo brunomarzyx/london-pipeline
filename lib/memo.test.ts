@@ -26,6 +26,11 @@ describe("extractFigures", () => {
     const figs = extractFigures("sitting 23.9% below its 10-year peak");
     expect(figs.map((f) => f.value)).toEqual([-23.9]);
   });
+
+  it("negates rates after fell-words but not levels or counts", () => {
+    const figs = extractFigures("sales fell 6.4% to 3,536; price down to £447,950");
+    expect(figs.map((f) => f.value)).toEqual([-6.4, 3536, 447950]);
+  });
 });
 
 describe("verifyFigures", () => {
@@ -34,6 +39,18 @@ describe("verifyFigures", () => {
     expect(v.total).toBe(2);
     expect(v.verified).toBe(2);
     expect(v.unverified).toEqual([]);
+  });
+
+  it("verifies a fell-phrased rate against a negative fraction", () => {
+    const tools = ['{"code":"E09000030","name":"Tower Hamlets","salesChange":-0.0637}'];
+    const v = verifyFigures(["sales in 2025 vs 2024 fell 6.4% to 3,536."], tools);
+    expect(v.unverified.map((u) => u.raw)).not.toContain("6.4%");
+  });
+
+  it("still catches a derived gap between two tool numbers", () => {
+    const tools = ['{"a":-14.6,"b":-10.6}'];
+    const v = verifyFigures(["around 4.0 points below Camden."], tools);
+    expect(v.verified).toBe(0);
   });
 
   it("catches an invented number", () => {

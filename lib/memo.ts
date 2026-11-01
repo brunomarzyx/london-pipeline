@@ -107,9 +107,18 @@ export function extractFigures(text: string): Figure[] {
     const after = norm.slice(FIGURE_RE.lastIndex, FIGURE_RE.lastIndex + 40);
     const belowPeak =
       /^[^.]{0,40}?\bbelow\b[^.]{0,20}?\bpeak\b/i.test(after) && !negative;
+    // "sales fell 6.4%" states a negative change without a minus sign.
+    // Only for rates (%, x), never for £ levels or bare counts ("fell to 3,536").
+    const before = norm.slice(Math.max(0, m.index - 30), m.index);
+    const fellWord =
+      /\b(fell|fall|falls|fallen|falling|declined|decline|declines|dropped|drop|drops|down|lower|weaker|contracted|shrank)\b[^.]{0,30}$/i.test(
+        before,
+      ) && !negative;
+    const isRate =
+      unit === "%" || unit === "×" || unit.toLowerCase() === "x";
     out.push({
       raw: token.trim(),
-      value: belowPeak ? -value : value,
+      value: belowPeak || (fellWord && isRate) ? -value : value,
       percent: unit === "%",
     });
   }

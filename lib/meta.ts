@@ -15,6 +15,7 @@ export interface ChatOptions {
 }
 
 export interface UsageRecord {
+  ts: string;
   model: string;
   prompt: string;
   completion: string;
@@ -83,6 +84,7 @@ export async function chat(
     totalTokens = res.usage?.total_tokens ?? 0;
   }
   const usage: UsageRecord = {
+    ts: new Date().toISOString(),
     model: MODEL,
     prompt: userMessage,
     completion: reply,

@@ -8,6 +8,11 @@ describe("meta wrapper (mock)", () => {
     expect(reply).toBe("ok");
   });
 
+  it("usage record carries an ISO timestamp", async () => {
+    const { usage } = await chat("reply with the word ok");
+    expect(usage.ts).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
   it("chatJSON validates the fixture against the schema", async () => {
     const data = await chatJSON(
       "borough brief",

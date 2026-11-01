@@ -265,9 +265,20 @@ async function verifyAnswer(
   return { total: v.total, verified: v.verified };
 }
 
+const INJECTION_RE =
+  /ignor(e|ing) (your|these|all|the) instructions|disregard .*instructions|reveal (your|the) (system )?prompt|what is your system prompt/i;
+
 export async function askQuestion(
   question: string,
 ): Promise<{ answer: string; rounds: number; verification: AskVerification }> {
+  if (INJECTION_RE.test(question)) {
+    return {
+      answer:
+        "I can't follow instructions embedded in a question. I answer questions about London housing supply, prices, rents and the housing cycle — for example, which borough has the highest supply pressure.",
+      rounds: 0,
+      verification: { total: 0, verified: 0 },
+    };
+  }
   const system = await fs.readFile(
     path.join(process.cwd(), "prompts", "ask.md"),
     "utf8",
