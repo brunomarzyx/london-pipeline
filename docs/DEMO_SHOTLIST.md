@@ -1,5 +1,7 @@
 # Demo shot list (3 minutes, 7 shots)
 
+> Superseded by [DEMO_SCRIPT.md](DEMO_SCRIPT.md) (final video script, 4 Nov). Kept for history.
+
 Record with live data where the numbers below are quoted from the app on screen — never from memory. Mock mode (`MOCK_META=1`) runs the same UI with zero spend if the API key is unavailable. See [DEMO_SCRIPT.md](DEMO_SCRIPT.md) for the long-form script.
 
 ## Shot 1 — 0:00–0:25 — Dashboard map

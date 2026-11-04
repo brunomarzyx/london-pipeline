@@ -1,5 +1,7 @@
 # London Pipeline
 
+**Live demo:** https://london-pipeline.fly.dev · Built solo for the Meta Global AI Developer Hackathon (Indie track).
+
 London's housing supply data is public but scattered — Land Registry prices in one place, MHCLG starts and completions in another, boundaries somewhere else — so nobody can see at a glance where the construction pipeline is building up and could weigh on prices. London Pipeline puts all 33 boroughs on one map with an analyst you can question: borough cycle phases, street-level fair prices from 4.6 million EPC-matched sales, a value-vs-momentum screen, a 10-signal Area Risk Score with buyer and investor lenses, and analyst memos with every figure verified against source data.
 
 ![Dashboard: London boroughs coloured by supply pressure](docs/img/dashboard.png)
@@ -76,7 +78,7 @@ Checks: `npx tsc --noEmit` · `MOCK_META=1 npx vitest run --cache=false` (24 fil
 - The screen is a starting list, not a valuation; repeat-sales momentum is MSOA-level, not street-level.
 - Risk scores are within-London bands, not absolute risk; postcodes with different signal coverage are not strictly comparable.
 - Prices are averages from source data, not forecasts; missing values show as "no data", never invented.
-- Approvals data is not in this build (GLA Planning London Datahub needs an access request).
+- Borough-level approvals are not in the borough tables, so Ask London says so if asked to rank boroughs by approvals. Approved-but-not-started and under-construction homes are available per postcode (within 1 km) through the Area Risk Score, from the Planning London Datahub guest API.
 
 ## Architecture
 

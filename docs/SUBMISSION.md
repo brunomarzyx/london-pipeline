@@ -6,7 +6,7 @@ Due Wed 4 Nov, 9:00 PM ET (02:00 UK, Thu 5 Nov). Submit at https://cerebralvalle
 London Pipeline
 
 ## One-liner
-Paste a London property listing and Muse Spark checks the price against street-level sales, scores the area on eleven public risk datasets and returns a verdict where every number is traced to a source.
+Paste a London property listing and Muse Spark checks the price against street-level sales, scores the area on ten public risk signals and returns a verdict where every number is traced to a source.
 
 ## Problem statement
 Build for Your World
@@ -27,13 +27,13 @@ An investor starts from the map. The Area Risk Score has a buyer lens and an inv
 - Most of the code was written by Muse Code (muse-spark-1.3-contributor), run as several agents in parallel git worktrees; I planned the phases, reviewed and merged.
 
 ## What was built during the hackathon
-Everything. The repo starts at commit af51132 on 30 Oct 2026; every commit is from 30 Oct onwards. Built in phases: data ingest and borough map, Ask London, cycle-phase classifier, rents and yields, analyst memo, global capitals view, street-level comps from Land Registry, EPC floor areas and fair range, value screen, neighbourhood context, eleven area datasets with the Area Risk Score, and the due-diligence agent with voice.
+Everything. The repo starts at commit af51132 on 30 Oct 2026; every commit is from 30 Oct onwards. Built in phases: data ingest and borough map, Ask London, cycle-phase classifier, rents and yields, analyst memo, global capitals view, street-level comps from Land Registry, EPC floor areas and fair range, value screen, neighbourhood context, the ten-signal Area Risk Score, and the due-diligence agent with voice.
 
 ## Data
 HM Land Registry Price Paid and UK HPI, MHCLG EPC register, ONS postcode lookup and rents, OS Code-Point Open and Open Greenspace, IMD 2025, TfL PTAL, data.police.uk, Environment Agency flood zones, LAEI air quality, Defra noise mapping (Round 4), DfE GIAS with Ofsted outcomes, NaPTAN, planning.data.gov.uk heritage datasets, Planning London Datahub, Inside Airbnb. Licences and as-of dates are in data/SOURCES.md.
 
 ## Links
-- Repo: https://github.com/brunomarzyx/london-pipeline (make public before submitting)
-- Live demo: [Fly.io URL after deploy]
+- Repo: https://github.com/brunomarzyx/london-pipeline (public)
+- Live demo: https://london-pipeline.fly.dev
 - Video (3 min): [link]
 - X post (Most Viral prize): [link]
