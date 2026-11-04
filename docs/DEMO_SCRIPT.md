@@ -17,8 +17,7 @@ Part 1 is the 3-minute video. Part 2 is everything I built and how to explain it
 - **Diligence input.** Paste this exactly, buyer lens:
   `2 bed flat on Copleston Road, London SE15 4AN. £650,000. 70 sq m internal area.`
   It is served from the recorded run and shows a "cached run" label. Say so on camera, because hiding it looks worse if a judge notices.
-- **Live question, by voice.** Ask Ask London: "Which three boroughs have the highest gross rental yield?" This runs live and takes about 10 seconds. Read the boroughs off the screen, not from memory.
-- **Do NOT ask "which boroughs have the most units approved but not started?"** Borough-level approvals aren't in the build, and the agent will say so.
+- **Live question, by voice.** Ask Ask London: "Which boroughs have the most units approved but not started?" This runs live and takes about 15 seconds. Tested at 12:50: Tower Hamlets 13,815, Brent 8,429, Newham 6,220, with 5/5 figures verified. Read the numbers off the screen, not from memory. Backup question: "Which three boroughs have the highest gross rental yield?" 
 - **Recording.** Use QuickTime: File > New Screen Recording, mic on, 1080p, under 3:00. Upload it to YouTube as Unlisted and paste the link into the submission.
 
 ### Script
@@ -28,7 +27,7 @@ Part 1 is the 3-minute video. Part 2 is everything I built and how to explain it
 
 **0:20–0:45 — The supply map**
 Toggle the layer to supply pressure, then to cycle phase.
-"All 33 boroughs. Supply pressure is homes started but not yet completed, against what the borough normally completes in a year. Above one year's worth, the rules call it hypersupply. The phase comes from rules, not the model, so it's explainable. Muse Spark writes the reasoning."
+"All 33 boroughs. Supply pressure is homes started but not yet completed, against what the borough normally completes in a year. Above one year's worth, the rules call it hypersupply, and right now no borough is there: most of London is draining its pipeline with prices falling. The phase comes from rules, not the model, so it's explainable. Muse Spark writes the reasoning."
 
 **0:45–1:05 — Postcode, investor lens** (tab: E14 9AF)
 "Down to postcode level. On the investor lens E14 9AF scores 61, Elevated. The biggest driver is new supply: 13,145 homes approved or under construction within a kilometre, more than 99% of London. A landlord needs to price that in."
@@ -40,15 +39,15 @@ Point at the verdict.
 "Looks fair. On a size-adjusted basis, using EPC floor areas, the range is £587,000 to £789,000, and £650,000 sits inside it. It gives three risks, two strengths and the questions to ask the agent. Then the important bit: a verifier checks every number in the verdict against the tool outputs, and here it's 10 out of 10. If a number doesn't match, the model gets one repair attempt. Otherwise the app says 'not enough data' instead of guessing."
 
 **1:55–2:20 — Ask London, live, by voice**
-Click the mic and ask the yield question.
-"Same tools, plain English, and this one is live. Meta's Muse Voice Transcribe handles the speech, then Spark calls the borough tools and answers with numbers it was given."
+Click the mic and ask the approvals question.
+"Same tools, plain English, and this one is live. Meta's Muse Voice Transcribe handles the speech. Spark ranks boroughs on homes with planning approval that haven't started, from the GLA's Planning London Datahub. That's the supply still to come, and every number is checked."
 
 **2:20–2:40 — Value screen** (tab: screen)
 Tick "Exclude Flood Zone 3" and set a max risk score. Point at the top row.
 "For an investor: neighbourhoods at least 10% cheaper per square metre than their borough, where prices are moving faster than the borough. The risk filters knock out anything flood-exposed."
 
 **2:40–3:00 — How it's built, close**
-"Public data from Land Registry, MHCLG, the EPC register, the GLA and a dozen more, in SQLite, on Next.js, deployed on Fly. Muse Spark runs two tool-calling agents and reads listings and floorplans. Muse Code wrote most of the code, running as parallel agents; I planned it, reviewed it and merged it. Everything was built during the hackathon. Next: phase-change alerts and borough approvals data. Thanks."
+"Public data from Land Registry, MHCLG, the EPC register, the GLA and a dozen more, in SQLite, on Next.js, deployed on Fly. Muse Spark runs two tool-calling agents and reads listings and floorplans. Muse Code wrote most of the code, running as parallel agents; I planned it, reviewed it and merged it. Everything was built during the hackathon. Next: phase-change alerts and an approvals trend. Thanks."
 
 ---
 
@@ -76,7 +75,8 @@ I built a London property analysis tool on Meta's Muse Spark. It works at two le
 - **Muse Code** wrote most of the code. It ran as several agents in parallel git worktrees, in 17 phases, and I wrote the phase prompts, reviewed and merged.
 
 ### Methods I must be able to explain
-- **Supply pressure** = (starts − completions over the period) ÷ average annual completions. At 1.0 or above, the borough is hypersupply. Data is from MHCLG.
+- **Supply pressure** = (starts − completions over three financial years) ÷ average annual completions, with completions floored at 250 a year. At 1.0 or above, the borough is hypersupply. Data is from MHCLG.
+- **Approvals** (Ask London) = homes on sites approved 2015 to Sep 2026 and not yet started, from the Planning London Datahub. Duplicate sites are merged, lapsed permissions dropped, and each site is placed in a borough by its coordinates. Under construction is an upper bound, because completion records are patchy.
 - **Cycle phase rules.** Supply pressure of 1.0 or more is hypersupply. Otherwise, a falling 12-month price is recession. Otherwise, pressure under 0.25 is recovery. Anything else is expansion.
 - **Fair range.**
   - Matching: 4.6m EPC certificates are matched to Land Registry sales (90% match), so every sale gets a £ per sq m figure.
@@ -88,15 +88,17 @@ I built a London property analysis tool on Meta's Muse Spark. It works at two le
   - Bands: Low under 33, Moderate 33–55, Elevated 55–70, High over 70.
 - **Cost control.**
   - Volume: about 400k tokens used across the build.
-  - Safeguards: a demo cache for the showcase inputs, rate limits, a daily token cap, and a mock mode that runs the whole app and 190 tests with zero spend.
+  - Safeguards: a demo cache for the showcase inputs, rate limits, a daily token cap, and a mock mode that runs the whole app and 191 tests with zero spend.
 
 ### Hard questions, short answers
 - **"Isn't this just RAG?"** No. Nothing is retrieved as text. The model calls typed tools over a database, picks the order itself, and every number it writes is verified against what the tools returned.
-- **"Why is Richmond or Kingston in hypersupply?"** The ratio divides by annual completions. A borough that normally completes few homes looks pressured with a modest pipeline. It's a flag to investigate, not a forecast. I'd add a minimum-size threshold next.
+- **"Why the 250 floor in supply pressure?"** Richmond completes about 77 homes a year, so a 180-home pipeline made it look like hypersupply at 2.3x. I floored the denominator at 250 a year, about London's lower-quartile borough, so a small base can't create a false signal. That moved Richmond and Kingston out of hypersupply.
+- **"Why is most of London in recession?"** That's the rules applied to the data. 23 of 33 boroughs have falling 12-month prices, and almost every pipeline is draining (negative net build-up). It's consistent with the slump in starts since 2023.
+- **"Are the borough texts live?"** They were written live by Muse Spark and recorded, so pages load instantly and don't spend credits on every view. Each is reused only while its exact inputs still match. Ask London and the diligence agent run live.
 - **"Did you write the code?"** I designed the system, wrote the phase plans and prompts, chose the data and methods, and reviewed and merged everything. Muse Code did most of the typing, and that's the point of the tooling.
-- **"How do you know it's right?"** There are 190 automated tests and a logged eval of live questions with pass/fail verifier results (`docs/EVAL.md`). Two early failures led to fixes. The diligence run went from 58 seconds to 21 seconds after a schema fix.
+- **"How do you know it's right?"** There are 191 automated tests and a logged eval of live questions with pass/fail verifier results (`docs/EVAL.md`). Two early failures led to fixes. The diligence run went from 58 seconds to 21 seconds after a schema fix.
 - **"What's missing?"**
-  - Borough approvals data: the Datahub needs an access request. Postcode-level pipeline is in.
+  - An approvals time series (only the current stock is loaded).
   - Phase-change alerts.
   - Data age: flood zones are from 2023 and PTAL from 2015.
 - **"Is it advice?"** No. Address-level EPC fields are hidden, there's a disclaimer, and it's for information only.

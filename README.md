@@ -17,7 +17,7 @@ Built 26 Oct to 4 Nov 2026 for the Meta AI Developer Hackathon. All code in this
 ## What it does
 
 - Borough cycle map: 33-borough choropleth (price change, pipeline build-up, supply pressure, starts momentum, yield, cycle phase) with a ranked table.
-- Ask London: plain-English questions answered by a tool-calling analyst over borough, street, global and risk data, with a figure verifier.
+- Ask London: plain-English questions answered by a tool-calling analyst over borough, street, global and risk data, with a figure verifier. Includes borough approvals: "Which boroughs have the most units approved but not started?" ranks boroughs on Planning London Datahub counts.
 - Street comps + fair range (`/area/[postcode]`): size-adjusted £/sq m fair range with a street → borough fallback ladder and repeat-sales momentum.
 - Value screen (`/screen`): LSOAs ≥10% below their borough on £/sq m where MSOA momentum beats the borough, with transport and deprivation filters.
 - Area Risk Score: one 0–100 score per postcode from 10 context signals, buyer/investor lens toggle, supply-pressure callouts.
@@ -78,7 +78,9 @@ Checks: `npx tsc --noEmit` · `MOCK_META=1 npx vitest run --cache=false` (24 fil
 - The screen is a starting list, not a valuation; repeat-sales momentum is MSOA-level, not street-level.
 - Risk scores are within-London bands, not absolute risk; postcodes with different signal coverage are not strictly comparable.
 - Prices are averages from source data, not forecasts; missing values show as "no data", never invented.
-- Borough-level approvals are not in the borough tables, so Ask London says so if asked to rank boroughs by approvals. Approved-but-not-started and under-construction homes are available per postcode (within 1 km) through the Area Risk Score, from the Planning London Datahub guest API.
+- Approvals come from the Planning London Datahub (approved decisions 2015 to Sep 2026, as of 1 Nov 2026), not MHCLG. `approvedNotStarted` is reliable; `underConstruction` counts started sites with no completion recorded, and Datahub completion records are patchy, so treat it as an upper bound. There is no approvals time series.
+- Supply pressure floors average annual completions at 250 homes a year (about London's lower-quartile borough), so boroughs that complete very few homes don't read as hypersupply off a small pipeline. With the floor, no borough is currently in hypersupply.
+- Borough cycle explanations and briefs are recorded live once (`scripts/precompute-cycle.ts`, `scripts/precompute-briefs.ts`) and reused only while their exact inputs still match, so pages load instantly; delete `data/demo-cache/{cycle,briefs}.json` to generate live again.
 
 ## Architecture
 
@@ -108,7 +110,7 @@ flowchart LR
 
 All calls go through one wrapper, `lib/meta.ts` (OpenAI SDK against `META_BASE_URL`, model `muse-spark-1.3`), which logs prompt, completion and cached tokens per call to `logs/usage.jsonl` and supports `MOCK_META=1` fixtures so the UI and tests run without spending credits.
 
-- **Ask London (tool-calling analyst agent):** the model gets six tools — `list_boroughs()`, `get_borough_metrics(code)`, `rank_boroughs(metric, n, order)`, `get_city_metrics(city)`, `get_area_comps(postcode, …)`, `get_area_risk(postcode, lens)` — over SQLite plus the BIS global snapshot. It calls tools, then answers in 2–3 sentences citing only returned numbers; if the data isn't there, it says so. Prompts: `prompts/ask.md`.
+- **Ask London (tool-calling analyst agent):** borough metrics include `approvedNotStarted` and `underConstruction` from the Planning London Datahub (`scripts/context/pipeline/build_borough.py`, sites assigned to boroughs by point-in-polygon). The model gets six tools — `list_boroughs()`, `get_borough_metrics(code)`, `rank_boroughs(metric, n, order)`, `get_city_metrics(city)`, `get_area_comps(postcode, …)`, `get_area_risk(postcode, lens)` — over SQLite plus the BIS global snapshot. It calls tools, then answers in 2–3 sentences citing only returned numbers; if the data isn't there, it says so. Prompts: `prompts/ask.md`.
 - **Structured borough briefs:** each borough page generates a validated JSON card `{headline, supply_view, price_view, risk_flag, confidence}` from that borough's metrics only (`prompts/brief.md`, zod-validated, retry-once then graceful fallback).
 - **Verified analyst memo:** one or two boroughs in, one JSON memo out (`prompts/memo.md`, zod-validated). Every figure is checked against tool results and the card shows a "✓ n/m figures verified" badge; the qualitative market read-across must contain no numbers.
 - **Global view:** eight capitals/cities from BIS residential property prices, deflated with national CPI into real indices, against policy rates. A rule-based phase (expansion / cooling / correction / recovery) comes from real-price momentum × rate direction. Supply data isn't comparable across cities, so this view is prices and rates only.

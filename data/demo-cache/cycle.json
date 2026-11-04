@@ -1,0 +1,200 @@
+{
+ "E09000030": {
+  "phase": "recession",
+  "priceChange": -13.28,
+  "pressure": -0.93,
+  "text": "Tower Hamlets is in recession. The average price of £447,950 is down −13.3% over 12 months, which points to falling prices alongside limited new building. Pressure of −0.93x means the stock of pipeline homes is running below typical annual completions rather than building up. There are not enough recent starts to measure momentum."
+ },
+ "E09000031": {
+  "phase": "recovery",
+  "priceChange": 0.73,
+  "pressure": -1.69,
+  "text": "Waltham Forest is in recovery, where prices are turning up while the pipeline remains drained. The average price of £532,212 is up 0.7% over 12 months, signalling a modest turn rather than strong growth. Pressure of −1.69x means the net build-up is negative relative to average annual completions, indicating past under-building. Momentum of 52.6% means starts in the latest 4 quarters were higher than the prior 4, suggesting building activity is picking up from that low base."
+ },
+ "E09000021": {
+  "phase": "expansion",
+  "priceChange": 4.85,
+  "pressure": 0.92,
+  "text": "Kingston upon Thames is in expansion, meaning prices are rising while building continues at a moderate pace. The average price is £597,587 after a 4.9% rise over the past 12 months. Pressure of 0.92x means the net build-up equals just under one year’s typical completions, so the pipeline is present but not outsized. Momentum of −17.2% means starts in the latest four quarters were lower than in the prior four, so recent building has eased while prices moved higher."
+ },
+ "E09000022": {
+  "phase": "recession",
+  "priceChange": -6.48,
+  "pressure": -0.24,
+  "text": "Lambeth is in recession, meaning prices are falling alongside little building activity. The average price of £540,198 after a −6.5% change over 12 months means homes are selling for less than a year ago. Pressure of −0.24x means the net build-up is below typical annual completions, pointing to a thin pipeline rather than excess supply. There are not enough recent starts to measure momentum, so the recent trend in starts cannot be read from the data."
+ },
+ "E09000023": {
+  "phase": "recession",
+  "priceChange": -1.64,
+  "pressure": -1.22,
+  "text": "Lewisham is in a recession phase, where prices are falling while little new building is adding to supply. The average price of £486,416 is down −1.6% over the last 12 months, indicating a softening market rather than a recovery. Pressure of −1.22x means the pipeline has been drawn down relative to average annual completions, so there is no large overhang of homes built up. There is not enough recent starts to measure for momentum, so the recent trend in starts cannot be read reliably."
+ },
+ "E09000024": {
+  "phase": "expansion",
+  "priceChange": 0.11,
+  "pressure": 0.68,
+  "text": "Merton is in expansion, in which prices rise while building continues at a moderate pace. The average price of £623,791, up 0.1% over 12 months, points to firming rather than falling values. Pressure of 0.68x means the net build-up in the pipeline equals just over two-thirds of an average year's completions, a manageable overhang rather than a glut. Momentum of −17.6% means starts in the latest four quarters are lower than the prior four, so building has cooled but continues alongside rising prices."
+ },
+ "E09000002": {
+  "phase": "recovery",
+  "priceChange": 4.74,
+  "pressure": -1.44,
+  "text": "Barking and Dagenham is in recovery, meaning prices are turning up while the development pipeline remains drained. The average price of £369,881 is up 4.7% over the last 12 months, indicating renewed price growth. Pressure of −1.44x means net build-up is below average annual completions, leaving little overhang to weigh on prices. Momentum of 22.2% shows recent starts running ahead of the prior period, but from a level still consistent with recovery rather than sustained expansion."
+ },
+ "E09000003": {
+  "phase": "recession",
+  "priceChange": -4.41,
+  "pressure": -1.6,
+  "text": "Barnet is in a recession phase, with the average price at £592,892 after a −4.4% fall over 12 months. Pressure of −1.6x means the build-up of homes has drained relative to average annual completions, pointing to little accumulated building. Momentum of 364.7% means starts in the latest four quarters were sharply higher than the prior four, so recent starting activity has jumped even while prices have fallen."
+ },
+ "E09000007": {
+  "phase": "recession",
+  "priceChange": -10.59,
+  "pressure": -0.04,
+  "text": "Camden is in recession. Its average price of £798,486 is down −10.6% over 12 months, meaning prices are falling. Pressure of −0.04x points to little build-up in the pipeline, consistent with little building. There is not enough recent starts to measure momentum."
+ },
+ "E09000011": {
+  "phase": "recession",
+  "priceChange": -2.17,
+  "pressure": -0.25,
+  "text": "Greenwich is in recession, which means prices are falling with little building in the pipeline. The average price is £462,868, down −2.2% over 12 months, which matches the falling-price side of a recession. Pressure of −0.25x means the net pipeline is slightly drained relative to average annual completions, so there is no large overhang of homes. Momentum of 807.7% means starts in the latest 4 quarters were much higher than the prior 4, indicating a recent pick-up in starts alongside softer prices."
+ },
+ "E09000012": {
+  "phase": "recession",
+  "priceChange": -1.62,
+  "pressure": -2.32,
+  "text": "Hackney is in recession, meaning prices are falling while building activity remains subdued. The average price of £619,408 is down −1.6% over 12 months, showing a softening market rather than a recovery. Pressure of −2.32x means the net shortfall is equivalent to 2.32 years of average completions, so there is no large overhang of homes weighing on prices. There are not enough recent starts to measure for momentum, leaving no clear signal of a building rebound."
+ },
+ "E09000013": {
+  "phase": "recession",
+  "priceChange": -5.08,
+  "pressure": -2.25,
+  "text": "Hammersmith and Fulham is in recession, meaning prices are falling while little new building is coming through. The average price of £754,825 is down −5.1% over the last 12 months. Pressure of −2.25x means the net build-up is negative relative to average annual completions, so the pipeline looks drained. Momentum of −36.4% means starts in the latest four quarters were that much lower than the prior four, reinforcing the subdued building picture."
+ },
+ "E09000015": {
+  "phase": "recession",
+  "priceChange": -2.46,
+  "pressure": -2.56,
+  "text": "Harrow is in recession, meaning prices are falling while little new building is adding to supply. The average price is £532,173 after a −2.5% fall over 12 months. Pressure of −2.56x points to a drained pipeline relative to past completions, and there are not enough recent starts to measure momentum. Together this suggests weakness is coming from demand rather than excess building weighing on prices."
+ },
+ "E09000033": {
+  "phase": "recession",
+  "priceChange": -14.3,
+  "pressure": -2.25,
+  "text": "City of Westminster is in recession. The average price of £887,206 is down −14.3% over 12 months, which is the falling-price side of this phase. Pressure of −2.25x means the pipeline has been drawn down by more than two years of typical completions, pointing to little building rather than an overhang. There are not enough recent starts to measure momentum, so there is no signal yet from starts about a turn."
+ },
+ "E09000008": {
+  "phase": "recession",
+  "priceChange": -1.54,
+  "pressure": -1.86,
+  "text": "Croydon is in a recession phase, meaning prices are falling with little building pressure behind the market. The average price of £396,718 is down −1.5% over 12 months, indicating continued softness. Pressure of −1.86x means the net build-up in the pipeline is negative relative to average annual completions, so there is no large overhang accumulating. Momentum of 125.0% shows starts in the latest 4 quarters are higher than the prior 4 quarters, but in this recession context that pickup has not yet fed through to prices."
+ },
+ "E09000016": {
+  "phase": "recovery",
+  "priceChange": 1.12,
+  "pressure": -0.57,
+  "text": "Havering is in recovery, where prices are turning up while the development pipeline remains drained. The average price of £444,572 is up 1.1% over 12 months, signalling a modest upward turn. Pressure of −0.57x means net build-up is below average annual completions, leaving little overhang to weigh on prices. Momentum of 21.4% means starts in the latest four quarters are higher than in the prior four, but from this drained position."
+ },
+ "E09000017": {
+  "phase": "recovery",
+  "priceChange": 0.04,
+  "pressure": -2.52,
+  "text": "Hillingdon is in recovery, where prices are turning up with a drained pipeline. The average price of £482,137 is up 0.04% over 12 months, signalling only a very slight upward turn rather than established growth. Pressure of −2.52x means cumulative build-up is deeply negative relative to completions, so there is little overhang to weigh on prices. There is not enough recent starts to measure for momentum."
+ },
+ "E09000018": {
+  "phase": "recession",
+  "priceChange": -1.45,
+  "pressure": -1.59,
+  "text": "Hounslow is in recession, meaning prices are falling while little new building is adding to supply. The average price of £528,051 is down −1.5% over 12 months, consistent with that weakening. Pressure of −1.59x points to a drained pipeline relative to past completions. Momentum of 0.0% means starts in the latest four quarters were unchanged on the prior four, so building is holding steady rather than rebuilding the pipeline."
+ },
+ "E09000019": {
+  "phase": "recession",
+  "priceChange": -8.6,
+  "pressure": -1.24,
+  "text": "Islington is in recession, meaning prices are falling while little new building is in the pipeline. The average price of £654,286 is down −8.6% over 12 months, showing a sustained price fall. Pressure of −1.24x points to a drained net build-up relative to average annual completions, consistent with little overhang. There is not enough recent starts to measure for short-term momentum."
+ },
+ "E09000020": {
+  "phase": "recession",
+  "priceChange": -13.76,
+  "pressure": -0.56,
+  "text": "Kensington and Chelsea is in recession, meaning prices are falling while little new building is adding to supply. The average price of £1,204,072 is down −13.8% over 12 months, showing a sharp fall from a year ago. Pressure of −0.56x means the pipeline has drained relative to past completion levels, so there is no large overhang waiting to come forward. There are not enough recent starts to measure momentum, so the recent pace of new starts cannot be read from the data."
+ },
+ "E09000025": {
+  "phase": "recession",
+  "priceChange": -4.71,
+  "pressure": -1.27,
+  "text": "Newham is in recession. The average price is £388,045 after a fall of −4.7% over 12 months, which fits a downturn in prices. Pressure of −1.27x points to a drained pipeline relative to average annual completions, consistent with little building pressure. There are not enough recent starts to measure momentum."
+ },
+ "E09000001": {
+  "phase": "recession",
+  "priceChange": -14.58,
+  "pressure": -0.91,
+  "text": "City of London is in recession, meaning prices are falling alongside little new building activity. The average price of £726,633 is down −14.6% over 12 months, indicating a sustained fall rather than a short dip. Pressure of −0.91x points to a drained pipeline relative to average annual completions, while momentum of −90.5% shows recent starts running far below the prior four quarters."
+ },
+ "E09000005": {
+  "phase": "recession",
+  "priceChange": -0.34,
+  "pressure": -0.26,
+  "text": "Brent is in a recession phase. The average price of £555,687 fell by −0.3% over 12 months, meaning values are softening rather than recovering. Pressure of −0.26x means net build-up is running below average annual completions, so there is no large overhang weighing on the market. There are not enough recent starts to measure momentum, leaving little sign of new supply restarting."
+ },
+ "E09000006": {
+  "phase": "recession",
+  "priceChange": -0.51,
+  "pressure": -2.06,
+  "text": "Bromley is in recession. The average price of £520,253 is down −0.5% over 12 months, meaning values are edging lower rather than turning up. Pressure of −2.06x means the build-up is running well below a typical year of completions, pointing to little building activity alongside those softer prices. There are not enough recent starts to measure momentum, so there is no clear signal from the latest starts trend."
+ },
+ "E09000029": {
+  "phase": "recovery",
+  "priceChange": 1.51,
+  "pressure": -0.08,
+  "text": "Sutton is in recovery, meaning prices are turning up while the development pipeline remains drained. The average price of £458,954 is up 1.5% over 12 months, indicating renewed upward movement rather than a strong surge. Pressure of −0.08x means there has been essentially no net build-up relative to average annual completions, consistent with a drained pipeline. There are not enough recent starts to measure momentum, so the recovery reading rests on the price uptick combined with limited overhang."
+ },
+ "E09000009": {
+  "phase": "recovery",
+  "priceChange": 1.84,
+  "pressure": -0.58,
+  "text": "Ealing is in recovery. The average price of £589,875 is up 1.8% over 12 months, meaning prices are turning up rather than falling. Pressure of −0.58x means the net build-up is below average annual completions, pointing to a drained pipeline with little overhang. Momentum of 730.4% means starts in the latest four quarters were much higher than in the prior four, consistent with new building picking up again after a quiet period."
+ },
+ "E09000010": {
+  "phase": "recovery",
+  "priceChange": 0.8,
+  "pressure": -2.12,
+  "text": "Enfield is in recovery, meaning prices are turning up while the pipeline is drained. The average price is £474,855 after a 0.8% rise over 12 months. Pressure of −2.12x means the net build-up is running well below average annual completions, consistent with that drained pipeline. There are not enough recent starts to measure short-term momentum."
+ },
+ "E09000032": {
+  "phase": "recession",
+  "priceChange": -5.34,
+  "pressure": -2.22,
+  "text": "Wandsworth is in recession, with the average price at £694,210 after a −5.3% fall over 12 months alongside subdued building. Pressure of −2.22x means the pipeline has been drawn down relative to average annual completions rather than building up. Momentum of 50.0% means starts in the latest four quarters were higher than in the prior four, but from a low level that still leaves little forward supply while prices are falling."
+ },
+ "E09000028": {
+  "phase": "recession",
+  "priceChange": -2.12,
+  "pressure": -1.69,
+  "text": "Southwark is in recession, meaning prices are falling while building activity is subdued. The average price is £569,160 after a −2.1% change over the last 12 months, showing a softening market rather than growth. Pressure of −1.69x means the pipeline is drained relative to average annual completions, leaving little built-up supply in the system. There are not enough recent starts to measure momentum, so the near-term direction of new building cannot be read from starts data."
+ },
+ "E09000026": {
+  "phase": "recession",
+  "priceChange": -2.81,
+  "pressure": -1.74,
+  "text": "Redbridge is in a recession phase. The average price of £484,378 follows a −2.8% fall over 12 months, meaning values are moving down. Pressure of −1.74x means the build-up of supply is below its average annual level of completions, consistent with little building. Momentum of −20.0% means starts in the latest 4 quarters were lower than in the prior 4, so the flow of new homes is slowing further."
+ },
+ "E09000027": {
+  "phase": "recession",
+  "priceChange": -0.04,
+  "pressure": 0.72,
+  "text": "Richmond upon Thames is in recession, meaning prices are falling while building activity is subdued. The average price is £813,931 after a −0.04% change over the past 12 months, indicating a slight decline. Pressure of 0.72x points to a modest net build-up relative to typical annual completions. Momentum of −65.5% shows starts in the latest four quarters are sharply lower than in the prior four, consistent with little new building."
+ },
+ "E09000004": {
+  "phase": "recovery",
+  "priceChange": 1.92,
+  "pressure": -0.32,
+  "text": "Bexley is in the recovery phase, where prices are turning up while the development pipeline remains drained. The average price of £414,833 is up 1.9% over 12 months, signalling a modest return to growth. Pressure of −0.32x means net build-up is below average annual completions, leaving little overhang to weigh on prices. Momentum of 483.3% shows starts in the latest four quarters are sharply higher than the prior four, consistent with building restarting from a low base."
+ },
+ "E09000014": {
+  "phase": "recession",
+  "priceChange": -1.44,
+  "pressure": -1.63,
+  "text": "Haringey is in recession, meaning prices are falling while building activity remains subdued. The average price is £633,221, down −1.4% over the past 12 months, consistent with that falling-price pattern. Pressure of −1.63x indicates a net depletion relative to average annual completions rather than a large pipeline overhang. There is not enough recent starts to measure for momentum, so no renewed surge in starts is evident."
+ }
+}

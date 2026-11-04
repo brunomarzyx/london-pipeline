@@ -19,14 +19,22 @@ export function netPipelineBuildup(
   return startsTotal - completionsTotal;
 }
 
-/** Supply pressure ratio; null (never Infinity) when completions are 0. */
+/**
+ * Floor on average annual completions in the pressure ratio (homes a year),
+ * about London's lower-quartile borough. Without it, boroughs that complete
+ * very few homes (Sutton ~57/yr, Richmond ~77/yr) read as hypersupply off a
+ * pipeline of 150-250 homes.
+ */
+export const MIN_COMPLETIONS_BASE = 250;
+
+/** Supply pressure ratio = net build-up ÷ max(avg annual completions, MIN_COMPLETIONS_BASE); null when inputs are missing or completions are 0. */
 export function supplyPressureRatio(
   netBuildup: number | null,
   avgAnnualCompletions: number | null,
 ): number | null {
   if (netBuildup == null || avgAnnualCompletions == null) return null;
   if (avgAnnualCompletions === 0) return null;
-  return netBuildup / avgAnnualCompletions;
+  return netBuildup / Math.max(avgAnnualCompletions, MIN_COMPLETIONS_BASE);
 }
 
 /** Gross rental yield in percent: 12 × avg monthly rent ÷ avg price × 100. */

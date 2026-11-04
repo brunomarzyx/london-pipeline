@@ -1,0 +1,332 @@
+{
+ "E09000030": {
+  "input": "{\"code\":\"E09000030\",\"name\":\"Tower Hamlets\",\"latestPrice\":447950,\"priceChange\":-13.28,\"netBuildup\":-1070,\"pressure\":-0.93,\"momentum\":null,\"avgRent\":2462,\"rentChange\":3.79,\"grossYield\":6.6,\"priceToRent\":15.16,\"latestSales\":3536,\"salesChange\":-0.064,\"newBuildShare\":0.175}",
+  "brief": {
+   "headline": "Tower Hamlets average price fell −13.3% to £447,950, signalling marked price weakness as the clearest takeaway.",
+   "supply_view": "Net buildup of −1,070 homes with pressure at −0.93x means completions outran starts so the pipeline is draining, while momentum has not enough recent starts to measure.",
+   "price_view": "At £447,950 after a −13.3% 12-month move prices show sustained softness, while average rent of £2,462 after a 3.8% rise points to firmer rental demand, leaving a 6.6% gross yield and 15.2x price-to-rent multiple for income versus purchase balance, alongside 3,536 sales in 2025 vs 2024 down −6.4% indicating slower turnover with a 17.5% new-build share of sales showing continued new-build presence.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000031": {
+  "input": "{\"code\":\"E09000031\",\"name\":\"Waltham Forest\",\"latestPrice\":532212,\"priceChange\":0.73,\"netBuildup\":-590,\"pressure\":-1.69,\"momentum\":0.526,\"avgRent\":1772,\"rentChange\":2.37,\"grossYield\":4,\"priceToRent\":25.03,\"latestSales\":3607,\"salesChange\":0.085,\"newBuildShare\":0.026}",
+  "brief": {
+   "headline": "Pipeline is draining with net buildup of −590 homes and pressure of −1.69x, even as starts momentum rebounds +52.6%.",
+   "supply_view": "Net buildup of −590 homes with pressure at −1.69x means completions outran starts so the pipeline is shrinking, while momentum of +52.6% implies recent starts are picking up from that drained base.",
+   "price_view": "Average price of £532,212 up 0.7% with average rent of £1,772 up 2.4% implies a 4.0% gross yield and 25.0x price-to-rent, while 3,607 sales up 8.5% in 2025 vs 2024 with a 2.6% new-build share points to resale-driven turnover holding up.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000021": {
+  "input": "{\"code\":\"E09000021\",\"name\":\"Kingston upon Thames\",\"latestPrice\":597587,\"priceChange\":4.85,\"netBuildup\":230,\"pressure\":0.92,\"momentum\":-0.172,\"avgRent\":1821,\"rentChange\":-0.44,\"grossYield\":3.66,\"priceToRent\":27.35,\"latestSales\":2343,\"salesChange\":0.02,\"newBuildShare\":0.005}",
+  "brief": {
+   "headline": "Average price up 4.9% to £597,587 while starts momentum eased −17.2%.",
+   "supply_view": "Net buildup is 230 homes, meaning starts outran completions over the last 3 years so the pipeline is growing. Pressure is 0.92x, meaning that excess equals almost a year of completions so supply overhang is material. Momentum is −17.2%, meaning starts in the latest 4 quarters were down on the prior 4 so near-term building activity is cooling.",
+   "price_view": "Average price is £597,587, setting the purchase level for the market. Price change is 4.9% over 12 months, indicating upward price movement. Average monthly rent is £1,821, setting the current rental cost level. Rent change is −0.4% over 12 months, indicating rents were broadly flat. Gross yield is 3.7%, showing annual rental income relative to price. Price-to-rent is 27.4x, meaning purchase prices are high relative to annual rents. Completed sales in calendar 2025 were 2,343, showing the scale of transactions. Sales in 2025 vs 2024 were up 2.0%, indicating stable turnover. New-build share of sales was 0.5%, meaning resales dominate activity.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000022": {
+  "input": "{\"code\":\"E09000022\",\"name\":\"Lambeth\",\"latestPrice\":540198,\"priceChange\":-6.48,\"netBuildup\":-130,\"pressure\":-0.24,\"momentum\":null,\"avgRent\":2538,\"rentChange\":3.42,\"grossYield\":5.64,\"priceToRent\":17.74,\"latestSales\":4578,\"salesChange\":0.059,\"newBuildShare\":0.054}",
+  "brief": {
+   "headline": "Lambeth average price £540,198 down −6.5% over 12 months, signalling clear price weakness as the defining signal.",
+   "supply_view": "Net buildup of −130 homes with pressure at −0.24x shows the pipeline is draining as completions outran starts, while momentum has not enough recent starts to measure.",
+   "price_view": "Average rent £2,538 up 3.4% implies rental resilience with a 5.6% gross yield and 17.7x price-to-rent, alongside 4,578 latest sales with sales in 2025 vs 2024 up 5.9% and a 5.4% new-build share pointing to steady resale-led turnover.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000023": {
+  "input": "{\"code\":\"E09000023\",\"name\":\"Lewisham\",\"latestPrice\":486416,\"priceChange\":-1.64,\"netBuildup\":-430,\"pressure\":-1.22,\"momentum\":null,\"avgRent\":1832,\"rentChange\":2,\"grossYield\":4.52,\"priceToRent\":22.13,\"latestSales\":3932,\"salesChange\":0.088,\"newBuildShare\":0.014}",
+  "brief": {
+   "headline": "Lewisham’s pipeline is draining with net buildup of −430 homes and pressure of −1.22x, signalling shrinking near-term supply as prices softened.",
+   "supply_view": "Net buildup of −430 homes with pressure of −1.22x means completions outran starts so the pipeline is shrinking, while momentum shows not enough recent starts to measure.",
+   "price_view": "Average price of £486,416 down −1.6% over 12 months points to soft pricing while average rent of £1,832 up 2.0% leaves a 4.5% gross yield at 22.1x price-to-rent, with 3,932 sales in 2025 vs 2024 up 8.8% and a 1.4% new-build share showing turnover driven by resales.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000024": {
+  "input": "{\"code\":\"E09000024\",\"name\":\"Merton\",\"latestPrice\":623791,\"priceChange\":0.11,\"netBuildup\":170,\"pressure\":0.68,\"momentum\":-0.176,\"avgRent\":2181,\"rentChange\":5.57,\"grossYield\":4.2,\"priceToRent\":23.83,\"latestSales\":2869,\"salesChange\":0.022,\"newBuildShare\":0.017}",
+  "brief": {
+   "headline": "Starts momentum fell 17.6% even as average prices edged up 0.11% to £623,791.",
+   "supply_view": "Net buildup was 170 homes, meaning starts ran ahead of completions so the pipeline grew. Pressure was 0.68x, implying about eight months of annual completions held in the buildup. Momentum was −17.6%, meaning recent starts were down on the prior period so near-term supply flow is softening. Completed sales in calendar 2025 were 2,869 homes, indicating continued turnover. Sales in 2025 vs 2024 were up 2.2%, implying broadly stable demand. New-build share of sales was 1.7%, meaning resales dominate activity.",
+   "price_view": "The average price was £623,791, setting the level buyers must fund. Price change was 0.11% over 12 months, implying essentially flat values. Average monthly rent was £2,181, defining the income side of the market. Rent change was 5.57% over 12 months, implying strengthening rental demand. Gross yield was 4.2%, meaning annual rent is a modest share of price. Price-to-rent was 23.8x, meaning buying costs almost 24 years of rent.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000002": {
+  "input": "{\"code\":\"E09000002\",\"name\":\"Barking and Dagenham\",\"latestPrice\":369881,\"priceChange\":4.74,\"netBuildup\":-1130,\"pressure\":-1.44,\"momentum\":0.222,\"avgRent\":1700,\"rentChange\":2.47,\"grossYield\":5.52,\"priceToRent\":18.13,\"latestSales\":1868,\"salesChange\":0.061,\"newBuildShare\":0.023}",
+  "brief": {
+   "headline": "Pipeline is draining at −1,130 homes with pressure −1.44x even as average price of £369,881 rose 4.7% on the year, signalling tightening future supply alongside rising values.",
+   "supply_view": "Net buildup of −1,130 homes and pressure of −1.44x mean completions outran starts so the pipeline is shrinking, while starts momentum of 22.2% suggests recent starts have picked up against the prior period.",
+   "price_view": "Average price of £369,881 up 4.7% shows values rising, while average rent of £1,700 up 2.5% leaves gross yield at 5.5% and price-to-rent at 18.1x indicating rental return relative to price, and 1,868 sales up 6.1% in 2025 vs 2024 with a 2.3% new-build share points to turnover growth driven by existing stock.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000003": {
+  "input": "{\"code\":\"E09000003\",\"name\":\"Barnet\",\"latestPrice\":592892,\"priceChange\":-4.41,\"netBuildup\":-1570,\"pressure\":-1.6,\"momentum\":3.647,\"avgRent\":1953,\"rentChange\":2.9,\"grossYield\":3.95,\"priceToRent\":25.3,\"latestSales\":4791,\"salesChange\":0.049,\"newBuildShare\":0.099}",
+  "brief": {
+   "headline": "Starts jumped +364.7% even as the average price eased −4.4% to £592,892.",
+   "supply_view": "The pipeline shows a net drain of −1,570 homes with pressure at −1.60x meaning completions have outrun starts and the pipeline is shrinking, while the +364.7% rise in recent starts points to a sharp rebuild of activity.",
+   "price_view": "At £592,892 down −4.4% with average rent at £1,953 up +2.9%, the market implies a 4.0% gross yield and 25.3x price-to-rent multiple, alongside 4,791 sales in 2025 up +4.9% for sales in 2025 vs 2024 with a 9.9% new-build share signalling steady resale-led turnover with rental support.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000007": {
+  "input": "{\"code\":\"E09000007\",\"name\":\"Camden\",\"latestPrice\":798486,\"priceChange\":-10.59,\"netBuildup\":-10,\"pressure\":-0.04,\"momentum\":null,\"avgRent\":2834,\"rentChange\":1.36,\"grossYield\":4.26,\"priceToRent\":23.48,\"latestSales\":2662,\"salesChange\":-0.066,\"newBuildShare\":0.041}",
+  "brief": {
+   "headline": "Camden prices fell −10.6% to £798,486, signalling marked price weakness.",
+   "supply_view": "Net buildup was −10 homes, meaning completions slightly outran starts so the pipeline is draining. Pressure was −0.04x, indicating a broadly balanced to slightly shrinking pipeline. Momentum has not enough recent starts to measure, leaving near-term starts direction unclear.",
+   "price_view": "Average price was £798,486, indicating a high absolute price level. Prices changed −10.6% over 12 months, indicating falling values. Average monthly rent was £2,834, supporting rental cashflow. Rents rose 1.4% over 12 months, pointing to firming rental levels. Gross yield was 4.3%, showing the annual rent return on price. Price-to-rent was 23.5x, meaning buyers pay a high multiple of annual rent. Completed sales were 2,662 in calendar 2025, showing the scale of transactions. Sales in 2025 vs 2024 were −6.6%, signalling softer turnover. New-build share was 4.1% of sales, indicating resales dominate activity.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000011": {
+  "input": "{\"code\":\"E09000011\",\"name\":\"Greenwich\",\"latestPrice\":462868,\"priceChange\":-2.17,\"netBuildup\":-210,\"pressure\":-0.25,\"momentum\":8.077,\"avgRent\":1998,\"rentChange\":6.05,\"grossYield\":5.18,\"priceToRent\":19.31,\"latestSales\":3461,\"salesChange\":-0.051,\"newBuildShare\":0.107}",
+  "brief": {
+   "headline": "Recent starts surged 807.7% even as average price slipped -2.2% to £462,868, making the supply rebound the standout signal.",
+   "supply_view": "Net buildup of -210 homes and pressure of -0.25x mean completions outran starts so the pipeline is draining, even though momentum of 807.7% points to a sharp pick-up in recent starts.",
+   "price_view": "Average price of £462,868 down -2.2% signals softening values while average rent of £1,998 up 6.1% underpins a 5.2% gross yield and 19.3x price-to-rent, with 3,461 sales in 2025 vs 2024 down -5.1% and a 10.7% new-build share pointing to resale-led activity holding up.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000012": {
+  "input": "{\"code\":\"E09000012\",\"name\":\"Hackney\",\"latestPrice\":619408,\"priceChange\":-1.62,\"netBuildup\":-1030,\"pressure\":-2.32,\"momentum\":null,\"avgRent\":2667,\"rentChange\":3.9,\"grossYield\":5.17,\"priceToRent\":19.35,\"latestSales\":3037,\"salesChange\":0.007,\"newBuildShare\":0.101}",
+  "brief": {
+   "headline": "Pipeline draining as completions outran starts by 1,030 homes, leaving pressure at −2.32x.",
+   "supply_view": "Net buildup was −1,030 homes over the last 3 financial years, meaning completions outran starts so the pipeline is draining. Pressure was −2.32x, indicating the supply pipeline is shrinking. Momentum has not enough recent starts to measure, leaving no clear read on the recent starts trend.",
+   "price_view": "The average price was £619,408, setting a high outright cost base. Prices changed −1.6% over 12 months, indicating a softening price backdrop. Average monthly rent was £2,667, showing the income level supporting the stock. Rents changed 3.9% over 12 months, pointing to continued rental growth. Gross yield was 5.2%, reflecting the annual rent relative to price. Price-to-rent was 19.4x, meaning prices stand at a high multiple of annual rent. Completed sales in calendar 2025 were 3,037, showing the scale of transactions. Sales in 2025 vs 2024 were up 0.7%, indicating broadly flat activity. New-build share of sales was 10.1%, meaning about one-in-ten sales were new-builds.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000013": {
+  "input": "{\"code\":\"E09000013\",\"name\":\"Hammersmith and Fulham\",\"latestPrice\":754825,\"priceChange\":-5.08,\"netBuildup\":-930,\"pressure\":-2.25,\"momentum\":-0.364,\"avgRent\":2861,\"rentChange\":4.95,\"grossYield\":4.55,\"priceToRent\":21.99,\"latestSales\":3013,\"salesChange\":0.005,\"newBuildShare\":0.131}",
+  "brief": {
+   "headline": "Hammersmith and Fulham fell −5.1% to £754,825 while the supply pipeline drained.",
+   "supply_view": "Net buildup of −930 homes means completions outran starts over the last 3 financial years, so the pipeline is draining. Pressure of −2.25x means the shortfall equals over two years of completions, so the supply pipeline is shrinking. Momentum of −36.4% means starts in the latest 4 quarters were down on the prior 4, pointing to weaker near-term supply addition.",
+   "price_view": "Average price of £754,825 sets a high purchase outlay. Price change of −5.1% over 12 months signals clear price softness. Average monthly rent of £2,861 shows the cash rent level underpinning income. Rent change of 5.0% over 12 months points to strengthening rents. Gross yield of 4.6% means annual rent is modest relative to price. Price-to-rent of 22.0x means the price equals about 22 years of rent, indicating a high valuation multiple. Completed sales of 3,013 in calendar 2025 show the scale of transactions. Sales change of 0.5% in 2025 vs 2024 indicates essentially flat sales volumes. New-build share of 13.1% means resales drove most transactions.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000015": {
+  "input": "{\"code\":\"E09000015\",\"name\":\"Harrow\",\"latestPrice\":532173,\"priceChange\":-2.46,\"netBuildup\":-1290,\"pressure\":-2.56,\"momentum\":null,\"avgRent\":1781,\"rentChange\":2.83,\"grossYield\":4.02,\"priceToRent\":24.9,\"latestSales\":2471,\"salesChange\":0.036,\"newBuildShare\":0.095}",
+  "brief": {
+   "headline": "Harrow pipeline is draining with −1,290 homes net buildup and −2.56x pressure while prices softened −2.5%.",
+   "supply_view": "Net buildup is −1,290 homes over the last 3 financial years, meaning completions outran starts so the pipeline is draining. Pressure is −2.56x, meaning the supply pipeline is shrinking. Momentum is not enough recent starts to measure, so the near-term starts trend cannot be read.",
+   "price_view": "Average price is £532,173, setting the level buyers must pay. Price change is −2.5% over 12 months, signalling softening values. Average monthly rent is £1,781, setting the current rental level. Rent change is 2.8% over 12 months, pointing to rising rents. Gross yield is 4.0%, showing annual rent relative to price. Price-to-rent is 24.9x, meaning the price is high relative to annual rent. Completed sales in calendar 2025 were 2,471, marking the volume of transactions. Sales in 2025 vs 2024 were up 3.6%, indicating slightly higher turnover. New-build share of sales was 9.5%, showing a small new-build weight in transactions.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000033": {
+  "input": "{\"code\":\"E09000033\",\"name\":\"City of Westminster\",\"latestPrice\":887206,\"priceChange\":-14.3,\"netBuildup\":-660,\"pressure\":-2.25,\"momentum\":null,\"avgRent\":3209,\"rentChange\":-0.37,\"grossYield\":4.34,\"priceToRent\":23.04,\"latestSales\":3189,\"salesChange\":-0.095,\"newBuildShare\":0.033}",
+  "brief": {
+   "headline": "City of Westminster prices down −14.3% to £887,206 as the supply pipeline drains by −660 homes.",
+   "supply_view": "Net buildup of −660 homes with pressure at −2.25x means completions outran starts so the pipeline is shrinking, while momentum has not enough recent starts to measure.",
+   "price_view": "Average price of £887,206 after a −14.3% 12-month change signals sharp price weakness alongside average rent of £3,209 down −0.4% implying soft rents, a 4.3% gross yield with a 23.0x price-to-rent multiple, and 3,189 sales in 2025 vs 2024 down −9.5% with a 3.3% new-build share pointing to subdued resale activity and limited new-build turnover.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000008": {
+  "input": "{\"code\":\"E09000008\",\"name\":\"Croydon\",\"latestPrice\":396718,\"priceChange\":-1.54,\"netBuildup\":-1320,\"pressure\":-1.86,\"momentum\":1.25,\"avgRent\":1586,\"rentChange\":3.39,\"grossYield\":4.8,\"priceToRent\":20.84,\"latestSales\":5274,\"salesChange\":0.071,\"newBuildShare\":0.016}",
+  "brief": {
+   "headline": "Croydon’s pipeline has drained by -1,320 homes to pressure of -1.86x, signalling a shrinking supply pipeline even as starts momentum rebounded +125.0%.",
+   "supply_view": "Net buildup of -1,320 homes with pressure at -1.86x means completions have outrun starts so the pipeline is draining, while momentum of +125.0% means recent starts have sharply picked up from the prior period.",
+   "price_view": "Average price of £396,718 down -1.5% on the year implies soft price conditions, while average rent of £1,586 up 3.4% implies strengthening rental demand at a 4.8% gross yield and 20.8x price-to-rent multiple, with 5,274 sales in 2025 vs 2024 up +7.1% and a 1.6% new-build share implying resale-led turnover.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000016": {
+  "input": "{\"code\":\"E09000016\",\"name\":\"Havering\",\"latestPrice\":444572,\"priceChange\":1.12,\"netBuildup\":-180,\"pressure\":-0.57,\"momentum\":0.214,\"avgRent\":1567,\"rentChange\":0.9,\"grossYield\":4.23,\"priceToRent\":23.64,\"latestSales\":3944,\"salesChange\":0.057,\"newBuildShare\":0.009}",
+  "brief": {
+   "headline": "Pipeline is draining at −180 homes with pressure at −0.57x, implying shrinking near-term supply even as starts momentum recovers to 21.4%.",
+   "supply_view": "Net buildup of −180 homes with pressure at −0.57x shows completions outran starts so the pipeline is shrinking, while momentum of 21.4% suggests recent starts are picking up and new-build share of 0.9% of sales shows very little new stock reaching buyers.",
+   "price_view": "Average price of £444,572 up 1.1% over 12 months alongside average rent of £1,567 up 0.9% implies steady values with rental balance at 4.2% yield and 23.6x price-to-rent, while 3,944 sales in 2025 vs 2024 up 5.7% points to firm demand.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000017": {
+  "input": "{\"code\":\"E09000017\",\"name\":\"Hillingdon\",\"latestPrice\":482137,\"priceChange\":0.04,\"netBuildup\":-890,\"pressure\":-2.52,\"momentum\":null,\"avgRent\":1581,\"rentChange\":3.4,\"grossYield\":3.93,\"priceToRent\":25.41,\"latestSales\":3584,\"salesChange\":0.118,\"newBuildShare\":0.066}",
+  "brief": {
+   "headline": "Hillingdon pipeline is draining on a net buildup of −890 homes and pressure of −2.52x while average price holds flat at £482,137.",
+   "supply_view": "Net buildup of −890 homes with pressure of −2.52x implies completions have outrun starts and the pipeline is shrinking, while momentum has not enough recent starts to measure.",
+   "price_view": "Average price of £482,137 up 0.04% implies flat pricing, while average rent of £1,581 up 3.4% implies firm rental demand at a 3.93% yield and 25.4x price-to-rent, with 3,584 sales up 11.8% in 2025 vs 2024 including a 6.6% new-build share implying steady resale-led turnover.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000018": {
+  "input": "{\"code\":\"E09000018\",\"name\":\"Hounslow\",\"latestPrice\":528051,\"priceChange\":-1.45,\"netBuildup\":-950,\"pressure\":-1.59,\"momentum\":0,\"avgRent\":1962,\"rentChange\":3.65,\"grossYield\":4.46,\"priceToRent\":22.43,\"latestSales\":2719,\"salesChange\":-0.008,\"newBuildShare\":0.06}",
+  "brief": {
+   "headline": "Hounslow pipeline is draining with pressure at −1.59x, signalling completions are running ahead of starts.",
+   "supply_view": "Net buildup is −950 homes over three years with pressure at −1.59x showing the supply pipeline is shrinking, while starts momentum at 0.0% indicates flat new-start activity.",
+   "price_view": "Average price is £528,051 down −1.5% on the year implying soft pricing, set against £1,962 average rent up 3.7% for a 4.5% gross yield and 22.4x price-to-rent multiple, with 2,719 sales in 2025 down −0.8% vs 2024 and a 6.0% new-build share pointing to a resale-driven market.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000019": {
+  "input": "{\"code\":\"E09000019\",\"name\":\"Islington\",\"latestPrice\":654286,\"priceChange\":-8.6,\"netBuildup\":-340,\"pressure\":-1.24,\"momentum\":null,\"avgRent\":2884,\"rentChange\":6.62,\"grossYield\":5.29,\"priceToRent\":18.91,\"latestSales\":2499,\"salesChange\":-0.147,\"newBuildShare\":0.026}",
+  "brief": {
+   "headline": "Islington averaged £654,286 down −8.6% over 12 months, signalling marked price weakness.",
+   "supply_view": "Net buildup of −340 homes with pressure at −1.24x means completions outran starts so the pipeline is draining, with not enough recent starts to measure momentum.",
+   "price_view": "Average rent of £2,884 up 6.6% points to firm rental demand against a 5.3% gross yield and 18.9x price-to-rent, while 2,499 sales in 2025 vs 2024 down −14.7% with a 2.6% new-build share points to quieter resale activity.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000020": {
+  "input": "{\"code\":\"E09000020\",\"name\":\"Kensington and Chelsea\",\"latestPrice\":1204072,\"priceChange\":-13.76,\"netBuildup\":-140,\"pressure\":-0.56,\"momentum\":null,\"avgRent\":3739,\"rentChange\":3.03,\"grossYield\":3.73,\"priceToRent\":26.84,\"latestSales\":2322,\"salesChange\":-0.017,\"newBuildShare\":0.047}",
+  "brief": {
+   "headline": "Prices fell −13.8% to £1,204,072, indicating marked price weakness.",
+   "supply_view": "Net buildup was −140 homes, meaning completions outran starts so the pipeline is draining. Pressure was −0.56x, meaning the supply pipeline is shrinking. Momentum shows not enough recent starts to measure, leaving the near-term starts trend unclear. Completed sales in calendar 2025 were 2,322 homes, indicating continued turnover. Sales in 2025 vs 2024 were −1.7%, implying volumes held broadly steady. New-build share was 4.7% of sales, meaning resales dominate transactions.",
+   "price_view": "Average price was £1,204,072, indicating a high capital outlay per purchase. Price change was −13.8% over 12 months, indicating material downward pressure. Average monthly rent was £3,739, indicating a high rental income level. Rent change was 3.0% over 12 months, indicating rents rose. Gross yield was 3.7%, indicating the annual rent relative to price. Price-to-rent was 26.8x, indicating price is a high multiple of annual rent.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000025": {
+  "input": "{\"code\":\"E09000025\",\"name\":\"Newham\",\"latestPrice\":388045,\"priceChange\":-4.71,\"netBuildup\":-1860,\"pressure\":-1.27,\"momentum\":null,\"avgRent\":1931,\"rentChange\":2.99,\"grossYield\":5.97,\"priceToRent\":16.75,\"latestSales\":2942,\"salesChange\":0.093,\"newBuildShare\":0.196}",
+  "brief": {
+   "headline": "Newham's −1,860-home pipeline drain at −1.27x pressure stands out as prices fell −4.7% to £388,045",
+   "supply_view": "Net buildup of −1,860 homes and pressure of −1.27x means completions outran starts so the supply pipeline is shrinking, with not enough recent starts to measure momentum.",
+   "price_view": "Average price of £388,045 down −4.7% alongside average rent of £1,931 up 3.0% implies a 6.0% gross yield and 16.8x price-to-rent multiple, with 2,942 sales in 2025 up 9.3% vs 2024 including a 19.6% new-build share.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000001": {
+  "input": "{\"code\":\"E09000001\",\"name\":\"City of London\",\"latestPrice\":726633,\"priceChange\":-14.58,\"netBuildup\":-300,\"pressure\":-0.91,\"momentum\":-0.905,\"avgRent\":null,\"rentChange\":null,\"grossYield\":null,\"priceToRent\":null,\"latestSales\":246,\"salesChange\":-0.283,\"newBuildShare\":0.041}",
+  "brief": {
+   "headline": "City of London prices fell −14.6% to £726,633 alongside a draining development pipeline.",
+   "supply_view": "Net buildup is −300 homes, meaning completions outran starts over the last 3 financial years so the pipeline is draining. Pressure is −0.91x, meaning the supply pipeline is shrinking. Momentum is −90.5%, meaning starts in the latest 4 quarters were sharply lower than the prior 4.",
+   "price_view": "Average price is £726,633, showing the current purchase level. Price change is −14.6% over 12 months, showing sharp downward price movement. Average rent is no data, so the rental level cannot be assessed. Rent change is no data, so the rental direction cannot be assessed. Gross yield is no data, so rental return cannot be assessed. Price-to-rent is no data, so valuation against annual rent cannot be assessed. Latest sales were 246 completed sales in calendar 2025, showing the scale of transactions. Sales in 2025 vs 2024 were −28.3%, showing much lower buying activity. New-build share was 4.1% of sales, showing resales drove almost all transactions.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000005": {
+  "input": "{\"code\":\"E09000005\",\"name\":\"Brent\",\"latestPrice\":555687,\"priceChange\":-0.34,\"netBuildup\":-240,\"pressure\":-0.26,\"momentum\":null,\"avgRent\":2018,\"rentChange\":4.94,\"grossYield\":4.36,\"priceToRent\":22.95,\"latestSales\":3078,\"salesChange\":0.18,\"newBuildShare\":0.13}",
+  "brief": {
+   "headline": "Brent sales in 2025 vs 2024 rose 18.0% to 3,078 even as the average price eased −0.3% to £555,687, suggesting demand held while values softened.",
+   "supply_view": "Net buildup was −240 homes with pressure at −0.26x, indicating the pipeline is draining as completions outran starts, while momentum shows not enough recent starts to measure.",
+   "price_view": "Average monthly rent of £2,018 rose 4.9% over 12 months for a 4.4% gross yield and 23.0x price-to-rent multiple, pointing to rental strength alongside soft prices, with new-builds at 13.0% of sales.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000006": {
+  "input": "{\"code\":\"E09000006\",\"name\":\"Bromley\",\"latestPrice\":520253,\"priceChange\":-0.51,\"netBuildup\":-530,\"pressure\":-2.06,\"momentum\":null,\"avgRent\":1693,\"rentChange\":3.23,\"grossYield\":3.91,\"priceToRent\":25.61,\"latestSales\":5145,\"salesChange\":0.047,\"newBuildShare\":0.021}",
+  "brief": {
+   "headline": "Bromley pipeline draining with pressure at −2.06x and −530 homes buildup as price eases −0.5% to £520,253",
+   "supply_view": "Net buildup of −530 homes with pressure of −2.06x means completions outran starts so the pipeline is draining, while momentum offers not enough recent starts to measure.",
+   "price_view": "Average price of £520,253 down −0.5% over 12 months suggests softening values while average monthly rent of £1,693 up 3.2% leaves a 3.9% gross yield and 25.6x price-to-rent multiple, with 5,145 sales in 2025 vs 2024 up 4.7% and a 2.1% new-build share pointing to resale-dominated turnover.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000029": {
+  "input": "{\"code\":\"E09000029\",\"name\":\"Sutton\",\"latestPrice\":458954,\"priceChange\":1.51,\"netBuildup\":-20,\"pressure\":-0.08,\"momentum\":null,\"avgRent\":1569,\"rentChange\":2.95,\"grossYield\":4.1,\"priceToRent\":24.38,\"latestSales\":2846,\"salesChange\":0.052,\"newBuildShare\":0.013}",
+  "brief": {
+   "headline": "Prices up 1.5% to £458,954 with rents up 3.0% while the supply pipeline is essentially flat.",
+   "supply_view": "Net buildup is -20 homes over the last 3 financial years, meaning completions just outran starts so the pipeline is barely draining. Pressure is -0.08x, meaning the shortfall equals only a small fraction of annual completions so supply pressure is minimal. Momentum shows not enough recent starts to measure, so there is no reliable signal on starts direction. Completed sales were 2,846 in calendar 2025, meaning transactions continued at that level. Sales in 2025 vs 2024 were up 5.2%, meaning demand was modestly higher year-on-year. New-build share was 1.3% of sales, meaning resales dominate activity.",
+   "price_view": "Average price is £458,954, meaning that is the capital required for a typical purchase. Price change was 1.5% over 12 months, meaning values rose modestly. Average monthly rent is £1,569, meaning that is the typical rental income level. Rent change was 3.0% over 12 months, meaning rents grew modestly. Gross yield is 4.1%, meaning annual rent equals that share of price. Price-to-rent is 24.4x, meaning price equals that multiple of annual rent.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000009": {
+  "input": "{\"code\":\"E09000009\",\"name\":\"Ealing\",\"latestPrice\":589875,\"priceChange\":1.84,\"netBuildup\":-680,\"pressure\":-0.58,\"momentum\":7.304,\"avgRent\":2126,\"rentChange\":3.76,\"grossYield\":4.32,\"priceToRent\":23.12,\"latestSales\":4022,\"salesChange\":-0.019,\"newBuildShare\":0.09}",
+  "brief": {
+   "headline": "Ealing posts 730.4% surge in starts even as 3-year pipeline drained by −680 homes, with price up 1.8% to £589,875",
+   "supply_view": "Net buildup of −680 homes with pressure at −0.58x means completions have outrun starts so the pipeline is shrinking, while momentum of 730.4% implies a sharp recent rebound in starts from a low base.",
+   "price_view": "Price averaging £589,875 up 1.8% implies firm values, alongside £2,126 average rent up 3.8% for a 4.3% gross yield and 23.1x price-to-rent, while 4,022 sales in 2025 vs 2024 down −1.9% with 9.0% new-build share points to broadly steady resale-led activity.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000010": {
+  "input": "{\"code\":\"E09000010\",\"name\":\"Enfield\",\"latestPrice\":474855,\"priceChange\":0.8,\"netBuildup\":-960,\"pressure\":-2.12,\"momentum\":null,\"avgRent\":1833,\"rentChange\":5.41,\"grossYield\":4.63,\"priceToRent\":21.59,\"latestSales\":3574,\"salesChange\":0.116,\"newBuildShare\":0.033}",
+  "brief": {
+   "headline": "Enfield's supply pipeline is draining at −2.12x, the standout signal for near-term tightness.",
+   "supply_view": "Net buildup is −960 homes over three years meaning completions outran starts, with pressure at −2.12x implying a shrinking pipeline, while momentum has not enough recent starts to measure.",
+   "price_view": "Average price is £474,855 up 0.8% implying flat growth alongside average rent of £1,833 up 5.4% implying firmer rental demand, translating to a 4.6% gross yield and 21.6x price-to-rent multiple implying purchase prices remain high relative to rents, with 3,574 sales in 2025 vs 2024 up 11.6% implying stronger turnover and a 3.3% new-build share implying resales dominate activity.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000032": {
+  "input": "{\"code\":\"E09000032\",\"name\":\"Wandsworth\",\"latestPrice\":694210,\"priceChange\":-5.34,\"netBuildup\":-2290,\"pressure\":-2.22,\"momentum\":0.5,\"avgRent\":2640,\"rentChange\":4.14,\"grossYield\":4.56,\"priceToRent\":21.91,\"latestSales\":5872,\"salesChange\":-0.011,\"newBuildShare\":0.069}",
+  "brief": {
+   "headline": "Wandsworth average price fell −5.3% to £694,210, signalling price weakness alongside a draining supply pipeline of −2,290 homes.",
+   "supply_view": "Net buildup of −2,290 homes with pressure of −2.22x means completions outran starts so the pipeline is shrinking, while momentum of 50.0% shows recent starts rebounded versus the prior period.",
+   "price_view": "Price softness contrasts with rent strength at £2,640 average rent up 4.1% for a 4.6% gross yield and 21.9x price-to-rent, while 5,872 sales in 2025 vs 2024 were down −1.1% with a 6.9% new-build share indicating limited new-build turnover.",
+   "risk_flag": "high",
+   "confidence": "high"
+  }
+ },
+ "E09000028": {
+  "input": "{\"code\":\"E09000028\",\"name\":\"Southwark\",\"latestPrice\":569160,\"priceChange\":-2.12,\"netBuildup\":-1310,\"pressure\":-1.69,\"momentum\":null,\"avgRent\":2516,\"rentChange\":7.29,\"grossYield\":5.3,\"priceToRent\":18.85,\"latestSales\":3912,\"salesChange\":0.05,\"newBuildShare\":0.07}",
+  "brief": {
+   "headline": "Southwark’s pipeline is draining with net buildup of −1,310 homes and pressure of −1.69x while the average price of £569,160 was down −2.1%.",
+   "supply_view": "Net buildup of −1,310 homes with pressure of −1.69x means completions outran starts so the pipeline is shrinking, with not enough recent starts to measure momentum.",
+   "price_view": "Average price of £569,160 down −2.1% implies softening values while average rent of £2,516 up 7.3% supports a 5.3% gross yield and 18.9x price-to-rent multiple, with 3,912 sales in 2025 up 5.0% sales in 2025 vs 2024 including a 7.0% new-build share indicating resale-led turnover.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000026": {
+  "input": "{\"code\":\"E09000026\",\"name\":\"Redbridge\",\"latestPrice\":484378,\"priceChange\":-2.81,\"netBuildup\":-620,\"pressure\":-1.74,\"momentum\":-0.2,\"avgRent\":1734,\"rentChange\":2.12,\"grossYield\":4.3,\"priceToRent\":23.28,\"latestSales\":3066,\"salesChange\":0.114,\"newBuildShare\":0.028}",
+  "brief": {
+   "headline": "Redbridge pipeline is draining with pressure at −1.74x and net buildup of −620 homes, meaning completions have outrun starts.",
+   "supply_view": "Net buildup of −620 homes with pressure of −1.74x means the supply pipeline is shrinking, and momentum of −20.0% shows recent starts have slowed further.",
+   "price_view": "Average price of £484,378 down −2.8% on the year signals soft price conditions, while average rent of £1,734 up 2.1% implies a 4.3% gross yield and 23.3x price-to-rent multiple, with 3,066 sales in 2025 up 11.4% vs 2024 and a 2.8% new-build share pointing to resale-led turnover.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000027": {
+  "input": "{\"code\":\"E09000027\",\"name\":\"Richmond upon Thames\",\"latestPrice\":813931,\"priceChange\":-0.04,\"netBuildup\":180,\"pressure\":0.72,\"momentum\":-0.655,\"avgRent\":2349,\"rentChange\":5.34,\"grossYield\":3.46,\"priceToRent\":28.88,\"latestSales\":3130,\"salesChange\":0.046,\"newBuildShare\":0.004}",
+  "brief": {
+   "headline": "Richmond upon Thames: starts fell −65.5% even as the pipeline holds 180 homes and the average price held flat at £813,931 (−0.0%).",
+   "supply_view": "Net buildup of 180 homes with pressure at 0.72x points to a still-building pipeline, though momentum of −65.5% means recent starts have slowed sharply.",
+   "price_view": "Average price of £813,931 was essentially flat at −0.0% over 12 months while average rent of £2,349 rose 5.3%, leaving a 3.5% gross yield and 28.9x price-to-rent multiple that means prices remain high relative to annual rents, with 3,130 sales in 2025 up 4.6% vs 2024 and a 0.4% new-build share showing resales dominate activity.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ },
+ "E09000004": {
+  "input": "{\"code\":\"E09000004\",\"name\":\"Bexley\",\"latestPrice\":414833,\"priceChange\":1.92,\"netBuildup\":-80,\"pressure\":-0.32,\"momentum\":4.833,\"avgRent\":1540,\"rentChange\":1.72,\"grossYield\":4.45,\"priceToRent\":22.45,\"latestSales\":3474,\"salesChange\":0.07,\"newBuildShare\":0.006}",
+  "brief": {
+   "headline": "Bexley starts rebounded +483.3% even as the 3-year pipeline sits at −80 homes.",
+   "supply_view": "Net buildup of −80 homes means completions outran starts so the pipeline is draining, with pressure at −0.32x indicating a shrinking supply pipeline, while momentum of +483.3% means recent starts are running sharply above the prior period.",
+   "price_view": "Average price of £414,833 up 1.9% implies modest price growth, with average rent of £1,540 up 1.7% implying steady rental demand, giving a 4.5% gross yield and 22.5x price-to-rent multiple that frames purchase cost against renting, while 3,474 sales in 2025 vs 2024 up 7.0% points to firmer turnover and a 0.6% new-build share means resales dominate activity.",
+   "risk_flag": "low",
+   "confidence": "high"
+  }
+ },
+ "E09000014": {
+  "input": "{\"code\":\"E09000014\",\"name\":\"Haringey\",\"latestPrice\":633221,\"priceChange\":-1.44,\"netBuildup\":-1640,\"pressure\":-1.63,\"momentum\":null,\"avgRent\":2225,\"rentChange\":1.32,\"grossYield\":4.22,\"priceToRent\":23.72,\"latestSales\":3150,\"salesChange\":0.1,\"newBuildShare\":0.054}",
+  "brief": {
+   "headline": "Pipeline is draining with net buildup of −1,640 homes, signalling shrinking near-term supply while the average price sits at £633,221.",
+   "supply_view": "Net buildup is −1,640 homes, meaning completions outran starts so the pipeline is draining; pressure is −1.63x, indicating the supply pipeline is shrinking; momentum has not enough recent starts to measure, leaving no read on a pickup in starts.",
+   "price_view": "Average price is £633,221 with a 12-month change of −1.4% suggesting softening; average monthly rent is £2,225 up 1.3% over 12 months indicating firm rental demand; gross yield is 4.2% with price-to-rent at 23.7x showing pricing remains high relative to rents; completed sales in 2025 vs 2024 rose 10.0% to 3,150 indicating improved liquidity; new-build share is 5.4% implying resales dominate activity.",
+   "risk_flag": "medium",
+   "confidence": "high"
+  }
+ }
+}

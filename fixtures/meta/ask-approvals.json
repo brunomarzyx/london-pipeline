@@ -1,1 +1,1 @@
-{"reply": "{\"type\": \"final\", \"answer\": \"(mock) Approvals data is not in this build, so I can't answer from permissions data.\"}"}
+{"reply": "{\"type\": \"tool_call\", \"name\": \"rank_boroughs\", \"args\": {\"metric\": \"approvedNotStarted\", \"n\": 3, \"order\": \"desc\"}}"}

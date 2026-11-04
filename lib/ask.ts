@@ -19,6 +19,8 @@ const MetricKey = z.enum([
   "rentChange",
   "salesChange",
   "newBuildShare",
+  "approvedNotStarted",
+  "underConstruction",
 ]);
 type MetricKey = z.infer<typeof MetricKey>;
 
@@ -223,6 +225,8 @@ function roundMetrics(d: ReturnType<typeof getBoroughDetail>): object | null {
     latestSales: d.latestSales,
     salesChange: r(d.salesChange),
     newBuildShare: r(d.newBuildShare),
+    approvedNotStarted: d.approvedNotStarted,
+    underConstruction: d.underConstruction,
   };
 }
 
@@ -290,7 +294,8 @@ export function renderSummary(history: { name: string; result: string }[]): stri
 
 function mockFixtureFor(question: string, round: number): string {
   if (/\[loop\]/.test(question)) return "ask-loop";
-  if (/approv|permission|consent/i.test(question)) return "ask-approvals";
+  if (/approv|permission|consent/i.test(question))
+    return round === 0 ? "ask-approvals" : "ask-approvals-final";
   if (/risk|area score/i.test(question))
     return round === 0 ? "ask-risk-tool" : "ask-risk-final";
   if (/fair|postcode|E ?\d/i.test(question))
@@ -386,7 +391,7 @@ export async function askQuestion(
       rounds: MAX_TOOL_ROUNDS + 1,
       verification: await verifyAnswer(parsed.data.answer, history),
     };
-  const answer = `Based on the data: ${renderSummary(history)}. Approvals data is not in this build.`;
+  const answer = `Based on the data: ${renderSummary(history)}.`;
   return {
     answer,
     rounds: MAX_TOOL_ROUNDS + 1,

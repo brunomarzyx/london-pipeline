@@ -31,7 +31,21 @@ export function fallbackCycleParagraph(
 const cycleCache = new Map<string, { text: string; at: number }>();
 const CYCLE_TTL_MS = 60 * 60 * 1000;
 
-export async function explainCyclePhase(code: string): Promise<string> {
+/** Precomputed explanations shipped with the app (scripts/precompute-cycle.ts). */
+export type CycleRecord = { phase: CyclePhase; priceChange: number | null; pressure: number | null; text: string };
+export const CYCLE_CACHE_FILE = path.join(process.cwd(), "data", "demo-cache", "cycle.json");
+let recorded: Record<string, CycleRecord> | null = null;
+async function recordedCycle(): Promise<Record<string, CycleRecord>> {
+  if (recorded) return recorded;
+  try {
+    recorded = JSON.parse(await fs.readFile(CYCLE_CACHE_FILE, "utf8")) as Record<string, CycleRecord>;
+  } catch {
+    recorded = {};
+  }
+  return recorded!;
+}
+
+export async function explainCyclePhase(code: string, opts: { skipRecorded?: boolean } = {}): Promise<string> {
   const hit = cycleCache.get(code);
   if (hit && Date.now() - hit.at < CYCLE_TTL_MS) return hit.text;
   const d = getBoroughDetail(code);
@@ -48,6 +62,12 @@ export async function explainCyclePhase(code: string): Promise<string> {
     pressure: r1(d.pressure),
     momentum: d.momentum == null ? null : Math.round(d.momentum * 1000) / 1000,
   };
+  // A recorded explanation is reused only while the inputs it was written from still hold.
+  if (process.env.MOCK_META !== "1" && !opts.skipRecorded) {
+    const rec = (await recordedCycle())[code];
+    if (rec && rec.phase === phase && rec.priceChange === metrics.priceChange && rec.pressure === metrics.pressure)
+      return rec.text;
+  }
   const system = await fs.readFile(
     path.join(process.cwd(), "prompts", "cycle.md"),
     "utf8",

@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import path from "node:path";
+import { readFileSync } from "node:fs";
 import {
   grossYield,
   netPipelineBuildup,
@@ -27,6 +28,23 @@ export interface BoroughMetrics {
   latestSales: number | null;
   salesChange: number | null;
   newBuildShare: number | null;
+  /** Homes on approved sites not yet started (Planning London Datahub). */
+  approvedNotStarted: number | null;
+  /** Homes on started sites with no completion recorded (Planning London Datahub). */
+  underConstruction: number | null;
+}
+
+type BoroughPipeline = { approvedNotStarted: number; underConstruction: number };
+let boroughPipeline: Record<string, BoroughPipeline> | null = null;
+function getBoroughPipeline(): Record<string, BoroughPipeline> {
+  if (boroughPipeline) return boroughPipeline;
+  try {
+    const p = path.join(process.cwd(), "data", "context", "pipeline-borough.json");
+    boroughPipeline = JSON.parse(readFileSync(p, "utf8")).boroughs ?? {};
+  } catch {
+    boroughPipeline = {};
+  }
+  return boroughPipeline!;
 }
 
 const FY_WINDOW = ["2023-24", "2024-25", "2025-26"];
@@ -85,6 +103,7 @@ export function getAllMetrics(): BoroughMetrics[] {
       `SELECT SUM(started_units) AS s FROM pipeline WHERE borough_code=? AND period IN (${periods.map(() => "?").join(",")})`,
     );
 
+  const bp = getBoroughPipeline();
   return boroughs.map((b) => {
     const latest = priceStmt.get(b.code, maxMonth) as
       | { avg_price: number | null }
@@ -132,6 +151,8 @@ export function getAllMetrics(): BoroughMetrics[] {
         volPrev?.sales ?? null,
       ),
       newBuildShare: newBuildShare(vol?.nb ?? null, vol?.sales ?? null),
+      approvedNotStarted: bp[b.code]?.approvedNotStarted ?? null,
+      underConstruction: bp[b.code]?.underConstruction ?? null,
     };
   });
 }

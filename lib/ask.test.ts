@@ -45,9 +45,13 @@ describe("ask loop (mock)", () => {
     expect(answer).toContain(top.name);
   });
 
-  it("says approvals data is not in this build", async () => {
-    const { answer } = await askQuestion("How many approvals were granted?");
-    expect(answer).toMatch(/not in this build/i);
+  it("ranks boroughs by homes approved but not started", async () => {
+    const { answer } = await askQuestion("Which boroughs have the most units approved but not started?");
+    const top = getAllMetrics()
+      .filter((b) => b.approvedNotStarted != null)
+      .sort((a, b) => b.approvedNotStarted! - a.approvedNotStarted!)[0];
+    expect(answer).toContain(top.name);
+    expect(answer).not.toMatch(/not in this build/i);
   });
 
   it("stops after 4 tool rounds and still answers", async () => {

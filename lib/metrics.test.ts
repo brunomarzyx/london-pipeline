@@ -41,6 +41,11 @@ describe("supplyPressureRatio", () => {
   it("returns null (not Infinity) when completions are zero", () => {
     expect(supplyPressureRatio(3000, 0)).toBeNull();
   });
+
+  it("floors small completion bases so tiny boroughs don't read as hypersupply", () => {
+    expect(supplyPressureRatio(180, 77)).toBeCloseTo(180 / 250);
+    expect(supplyPressureRatio(500, 1000)).toBeCloseTo(0.5);
+  });
   it("returns null when either value is null", () => {
     expect(supplyPressureRatio(null, 1000)).toBeNull();
     expect(supplyPressureRatio(3000, null)).toBeNull();
