@@ -45,7 +45,7 @@ All open data; see [data/SOURCES.md](data/SOURCES.md) for URLs and build scripts
 | ONS Price Index of Private Rents (City of London suppressed → null) | OGL v3 | Sep 2026 |
 | HM Land Registry Price Paid 2024–2025 London extract (volumes, new-build share) | OGL v3 | 2025 |
 | Price Paid 2016–Sep 2026 + ONS postcode lookup + OS Code-Point Open (street build) | OGL v3 | Sep 2026 |
-| MHCLG domestic EPC register, 4.6m London certificates matched to sales (90.1%) | OGL v3 | Dec 2026 |
+| MHCLG domestic EPC register, 4.6m London certificates matched to sales (90.1%) | OGL v3 | Oct 2026 |
 | IMD 2025 deprivation; TfL PTAL 2015 transport access; police.uk street crime | OGL v3 / TfL open data | 2025 / 2015 / Sep 2025–Aug 2026 |
 | Environment Agency Flood Map for Planning (flood zones) | OGL v3 | Aug 2023 |
 | GLA/TfL London Atmospheric Emissions Inventory 2022 (air) | OGL v3 | 2022 |
@@ -142,7 +142,7 @@ Every area page (`/area/[postcode]`) shows one 0–100 score (0 best, 100 worst)
 | Transport proximity | TfL open data (Elizabeth line stops) + PTAL 2015 | Sep 2026 |
 | Greenspace | OS Open Greenspace (OS Open Data licence) | Nov 2026 |
 | Heritage | planning.data.gov.uk conservation/listed/article-4 (OGL v3) | Nov 2026 |
-| EPC / MEES risk | MHCLG domestic EPC register (OGL v3) | Dec 2026 |
+| EPC / MEES risk | MHCLG domestic EPC register (OGL v3) | Oct 2026 |
 | Short lets | Inside Airbnb London listings (CC BY 4.0) | Sep 2026 |
 | Development pipeline | Planning London Datahub guest API (GLA) | Nov 2026 |
 
@@ -176,7 +176,6 @@ Attribution:
 Limitations:
 
 - **Starts momentum is n/a where the prior 4-quarter base is under 100 homes** (too noisy to annualise).
-- **Approvals data is not in this build** (GLA Planning London Datahub needs an access request).
 - **Prices are average prices from the source data, not forecasts.**
 - **Global city series are nominal**, deflated with national CPI; Paris/Berlin share the euro-area rate; Tel Aviv's 10-year peak uses history from 2017. Supply data isn't comparable across cities.
 - Missing values are `null` and show as "no data" — figures are never invented, estimated or interpolated.

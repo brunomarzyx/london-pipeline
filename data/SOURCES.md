@@ -22,7 +22,7 @@ Not used: GLA Planning London Datahub approvals (needs an access request); LDD a
 | Transport proximity | data/context/transport.db + data/street.db | TfL open data (Elizabeth line StopPoints) + TfL PTAL 2015; price-premium leg uses Price Paid sales Oct 2023–Sep 2026 (excluded from scoring: no pre-2022 baseline) | OGL v3 / TfL open data | Sep 2026 |
 | Greenspace | data/context/greenspace.db | OS Open Greenspace (TQ square, GML via OS Data Hub downloads API) | OS Open Data | Nov 2026 |
 | Heritage | data/context/heritage.db | planning.data.gov.uk conservation-area, listed-building, article-4-direction-area CSVs | OGL v3 | Nov 2026 |
-| EPC / MEES risk | data/context/epc.json | MHCLG domestic EPC register full load via main-repo extract, latest certificate per home | OGL v3 | to Dec 2026 |
+| EPC / MEES risk | data/context/epc.json | MHCLG domestic EPC register full load via main-repo extract, latest certificate per home | OGL v3 | to Oct 2026 |
 | Short lets | data/context/shortlets.json | Inside Airbnb London listings | CC BY 4.0 | Sep 2026 |
 | Development pipeline | data/context/pipeline.json | Planning London Datahub guest API, approved decisions 2015-01-01 to 2026-09-30 with ≥1 proposed residential unit | GLA | Nov 2026 |
 | Screen index (derived) | data/context/area-score-lsoa.json | built by `scripts/build-area-score-lsoa.ts` from street.db + the 10 signals above | derived | rebuilt on data refresh |
